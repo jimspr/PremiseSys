@@ -1,0 +1,201 @@
+<DriverLibrary Name="RadioRA2" Description="Lutron RadioRA" Version="1.1.11" ID="{FE106BCA-254C-4BE8-943D-4E68198B3A6D}">
+
+  <!--Note: ID on the class name below is the CLSID_RadioRA2 in the source file and is also specified on the "class" property on the merge entry below-->
+	<Class Name="RadioRA2" Description="Top level class for RadioRA2 Subsystem" ID="{5549B78A-9350-409E-9DC0-01C9F5F436C6}">
+		<SuperClass Name="Subsystem" LinkObject="sys://Schema/System/Subsystem" ID="{37868EB7-8CE6-4FD9-B3A6-2E9701C18DEF}"/>
+		<SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{BCD2684A-26A9-470B-A80B-CB14DBF303A8}"/>
+		<ChildClass Name="MainRepeater" Description="RadioRA2 Main Repeater" LinkObject="sys://Schema/RadioRA2/MainRepeater" ID="{510E1B1F-A84C-41DD-BA1A-DF3651EBEC22}"/>
+		<ChildClass Name="TelnetPort" Description="Used to connect to a repeater on the network" LinkObject="sys://Schema/RadioRA2/TelnetPort" ID="{23E480F8-C867-4181-B5A1-12410D964524}"/>
+  </Class>
+
+	<Class Name="TelnetPort" Icon="networks.ico" Description="Lutron telnet port" ID="{C49AE9C8-AFA3-45C4-9610-4676C1D9C48F}">
+		<SuperClass LinkObject="sys://Schema/Device/ExternalDevice" ID="{5670F1E0-E6D4-4A4F-A81A-2AD42727A91D}"/>
+		<Property Name="IPAddress" Class="sys://Schema/System/Text" Description="IP Address of the main repeater" ID="{6C213D34-1C09-4490-9BC4-6A2D19FC06B4}"/>
+		<Property Name="IPPort" Class="sys://Schema/System/Number" DefaultValue="23" Description="IP Port number to use to connect with device." ID="{D61AABBB-E19F-465E-A583-75939AC25065}"/>
+		<Property Name="Login" Class="sys://Schema/System/Text" Description="Telnet login if using network" ID="{9368A49D-9E6B-4C08-8ADA-59DE782E03A3}"/>
+		<Property Name="Password" Class="sys://Schema/System/Text" Description="Telnet password if using network" ID="{B8225039-2BE5-47F4-A087-644C92CCFD95}"/>
+		<!--<Property Name="MAC" Class="sys://Schema/System/Text" ReadOnly="True" Description="MAC Address of the device" ID="{011C49D8-62BB-4D92-96CA-7448AC03635E}"/>-->
+		<Property Name="_HTTPAddress" ReadOnly="True" Class="sys://Schema/System/Text" Description="IP Address of the device" ID="{B9492258-5015-4FBC-8399-D64BB6E96A29}"/>
+		<ClassView Name="Configure" ViewCLSID="@_HTTPAddress" ID="{36FDF9A5-82C3-4081-86D3-1E0629263634}"/>
+	</Class>
+
+	<Class Name="SystemInfo" ID="{6C7DC87D-4947-48EB-990F-B3EAACC4A596}">
+		<Property Name="QuerySystemInfo" Momentary="True" Persistent="False" Class="sys://Schema/System/Boolean" Description="Queries repeater for various system info" ID="{529609ED-E606-4AD1-812A-9DAADCA91597}"/>
+		<Property Name="Time" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{86F6AEA5-4820-4A4F-82EA-B1D7D288A506}"/>
+		<Property Name="Date" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{4CF1E165-06DA-44FF-A4D3-7054E1745ABE}"/>
+		<Property Name="Latitude" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{03F57D69-DF6A-47A6-83B9-C210D05E0290}"/>
+		<Property Name="Longitude" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{9FDE7C92-6823-4043-A236-54BBFBA8DCD2}"/>
+		<Property Name="TimeZone" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{FDD89FFD-DA2F-41F0-9DDC-79390243CE60}"/>
+		<Property Name="Sunset" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{F122FF7B-BCA4-4E59-8BD9-7EC0E240A309}"/>
+		<Property Name="Sunrise" Class="sys://Schema/System/Text" Description="" ReadOnly="True" ID="{FD2AFB37-E4CB-4387-B1E3-D2C15246F945}"/>
+		<Property Name="LoadShed" Class="sys://Schema/System/Boolean" Description="Is load shedding enabled" ReadOnly="True" ID="{F02451D0-6D1C-4E77-9E89-35AB4E9568A6}"/>
+	</Class>
+
+	<Class Name="MainRepeater" Icon="radiora.ico" Description="Repeater and RS232 controller for RadioRA2 system" ID="{86CFB02A-6C82-42D6-B613-5E75A8AF7456}">
+		<SuperClass Name="Transport" LinkObject="sys://Schema/Networks/Transport" ID="{6FDACFBA-2984-4B07-AF66-426D29A7A916}"/>
+		<SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{65C467C3-3494-47EB-88DF-2EC437329381}"/>
+		<SuperClass Name="ExternalDevice" LinkObject="sys://Schema/Device/ExternalDevice" ID="{B3B21FE0-2287-4697-A73F-F9A91F53505E}"/>
+		<SuperClass Name="SystemInfo" LinkObject="sys://Schema/RadioRA2/SystemInfo" ID="{F4C4783B-BD41-46B9-90AE-4428FE9461F5}"/>
+    <Property Name="DriverVersion" Class="sys://Schema/System/Text" ReadOnly="True" Description="Driver Version" ID="{BE31808D-843C-43D5-9261-C8857B5B03C2}"/>
+    <Property Name="Login" Class="sys://Schema/System/Text" ReadOnly="True" Persistent="False" Description="Telnet login if using network" ID="{2A82C533-0726-455A-8443-D292194E4C4F}"/>
+		<Property Name="Password" Class="sys://Schema/System/Text" ReadOnly="True" Persistent="False" Description="Telnet password if using network" ID="{3E3CCD95-4BC3-418A-A525-2CEBE1A9F0A2}"/>
+		<Property Name="Firmware" Class="sys://Schema/System/Text" Description="Current firmware version number" ReadOnly="True" ID="{2EFA278A-9993-4860-B5A4-94A8E8C4A99C}"/>
+		<Property Name="Command" Class="sys://Schema/System/Text" Persistent="False" Description="Command to send to repeater" ID="{769CE95D-ABE8-4ED6-A7D9-D4B8D318D336}"/>
+
+		<ChildClass Name="Dimmer" LinkObject="sys://Schema/RadioRA2/Dimmer" ID="{96834E7E-6563-4B47-B5FA-57ADDB3031DC}"/>
+		<ChildClass Name="Switch" LinkObject="sys://Schema/RadioRA2/Switch" ID="{AE953EAC-7886-4CF5-B133-8BEAE016EBF4}"/>
+    <ChildClass Name="Fan" LinkObject="sys://Schema/RadioRA2/Fan" ID="{7E5BCE5A-939C-4546-9EDD-025C2723A0E9}"/>
+    <ChildClass Name="TableTopKeypad" LinkObject="sys://Schema/RadioRA2/TableTopKeypad" ID="{581C7571-ADE3-4891-A232-30E59C659885}"/>
+		<ChildClass Name="seeTouch" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{CC26FE28-8429-4D58-BF8B-44CA22F3057C}"/>
+    <ChildClass Name="RadioPowrSavr" LinkObject="sys://Schema/RadioRA2/RadioPowrSavr" ID="{EC37AED2-D9DF-43F0-A7CC-BA843F1328EF}"/>
+    <ChildClass Name="VisorControlReceiver" LinkObject="sys://Schema/RadioRA2/VCRX" ID="{3EE5AF09-CB29-4B2D-802A-B22AC00A2C52}"/>
+  </Class>
+
+	<Class Name="Device" Description="Class for RadioRA2 devices" ID="{6F864698-B5A0-4EDA-AC33-7DD9ABB98288}">
+		<Property Name="DeviceID" Class="sys://Schema/System/Number" Description="Device Number (6-100)" ID="{04141BE8-E0AE-43BC-8499-FB35BE20C548}" >
+		</Property>
+	</Class>
+
+  <Class Name="Room" Description="Class for RadioRA2 devices" ID="{AAEEEBA0-4145-4978-963F-B04BAD6A86D5}">
+    <Property Name="IntegrationID" Class="sys://Schema/System/Number" Description="Device Number (6-100)" ID="{705924DE-9F37-4521-AF36-797C441FD41B}" >
+    </Property>
+  </Class>
+
+  <Class Name="Fade" Delegatable="-1" Description="Class for supporting fade times in dimmers" ID="{8110CCD8-4DA4-4C80-9EEC-4BE4822CDC49}">
+		<Property Name="FadeTime" Bindable="True" DefaultValue="0" Class="sys://Schema/System/Real" Description="Time for dimmers to fade from current intensity to target intensity." ID="{DC81728D-449F-440B-BFA4-3FCAD8119291}"/>
+		<Property Name="Flash" Class="sys://Schema/System/Boolean" Persistent="False" Description="Flash device.  Time is 2x fade time" ID="{8DA5201A-6EDE-4BF4-B9E3-B16CEDF49002}"/>
+	</Class>
+	<Class Name="Dimmer" Icon="radiorasw.ico" Description="Class for RadioRA2 dimmers" ID="{1DFF86AF-EC51-42A1-B99D-5892CC9C07CC}">
+		<SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{A57DA971-1E7F-4991-B5E1-2F4412A724B4}"/>
+		<SuperClass Name="Device" LinkObject="sys://Schema/RadioRA2/Device" ID="{9AE7C916-D81D-4D70-8B26-9D4AE0DBEAD3}"/>
+		<SuperClass Name="Power" LinkObject="sys://Schema/Device/Power" ID="{6A9EECDB-E35A-4206-9DFF-D71C886138A0}"/>
+		<SuperClass Name="Dimmer" LinkObject="sys://Schema/Device/Dimmer" ID="{A29553E1-FBEE-4EB8-B6FB-9609CCA85FDE}"/>
+		<SuperClass Name="Fade" LinkObject="sys://Schema/RadioRA2/Fade" ID="{7818CC5C-70B9-46E0-945B-518F41A511A9}"/>
+	</Class>
+
+	<Class Name="Switch" Icon="radiorasw.ico" Description="Class for RadioRA2 switches" ID="{A692A1B4-60BE-4C28-A491-0F140441763A}">
+		<SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{AE52DFDF-B945-462F-8999-82E377885607}"/>
+		<SuperClass Name="Device" LinkObject="sys://Schema/RadioRA2/Device" ID="{8A4F8105-2BE8-4E5D-96A1-63AC43B81FF5}"/>
+		<SuperClass Name="Power" LinkObject="sys://Schema/Device/Power" ID="{12280007-BCFE-4167-8928-66DFBB857CA2}"/>
+		<SuperClass Name="Fade" LinkObject="sys://Schema/RadioRA2/Fade" ID="{7AA1EBD7-354D-4B9D-B378-C05655C28D3B}"/>
+	</Class>
+
+  <Class Name="Fan" Icon="fan.ico" Description="Lutron HomeWorks fan control" ID="{7F23C3D9-D84F-4E14-BDCC-21267CFF25A2}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{A603A1A1-80A7-4111-98CC-11FA337B634F}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/RadioRA2/Device" ID="{5E96A14D-6076-4733-B711-8C0A08D25EE5}"/>
+    <SuperClass Name="Fan" LinkObject="sys://Schema/Device/Fan" ID="{B05C3CA7-E47A-4C95-92C2-37C8E27845A6}"/>
+    <Property Name="Setting" Class="sys://Schema/System/MultiValue" Description="Fan speed" ID="{03166257-9F10-4A98-B955-4C2F2AEF1E58}" >
+      <Enum Name="OFF" Value="0" ID="{98DEC7EC-ECF8-4D57-85F3-93060E213B92}"/>
+      <Enum Name="Low" Value="25" ID="{974C4582-25C1-4CC3-B7E7-162897CC8D12}"/>
+      <Enum Name="Medium" Value="50" ID="{6E743396-94B4-480B-8766-F5270AC778DD}"/>
+      <Enum Name="MediumHigh" Value="75" ID="{F93761CF-C602-49CE-90E6-348A73F0F47C}"/>
+      <Enum Name="FULL" Value="100" ID="{6425A3CA-BD8C-4A00-B1B5-00C18AD5036A}"/>
+    </Property>
+  </Class>
+
+  <Class Name="RadioPowrSavr" Icon="MotionSensor.ico" Description="Class for RadioRA2 LRF2-OCR2B" ID="{3CF86BAF-C7B8-46EC-8FEF-DFA153F7FEE5}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{AC1B23A8-72F3-467F-A80D-824A9F2B3E22}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/RadioRA2/Device" ID="{C99EA6DF-DBE8-4822-A0D2-B3C05C61FC92}"/>
+    <SuperClass Name="DigitalInput" LinkObject="sys://Schema/Device/DigitalInput" ID="{2409F8A7-3BBD-4B77-84D7-4D27BC7FC3D1}"/>
+    <Property Name="RoomID" Class="sys://Schema/System/Number" Description="Integration ID of Room(Group)" ID="{0B5BFA5D-83B7-46FF-B543-A4D034671626}">
+    </Property>
+  </Class>
+
+  <Class Name="Keypad" Virtual="1" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{F32427FD-656F-4D1F-87B2-2A34C0ADCC5D}">
+		<SuperClass Name="Device" LinkObject="sys://Schema/RadioRA2/Device" ID="{CB563041-4A79-450F-89BC-0CFA02136D2A}"/>
+		<SuperClass Name="KeypadDevice" LinkObject="sys://Schema/Device/Keypads/KeypadDevice" ID="{A245F5FD-F322-4614-AC58-8C1A123DF22A}"/>
+		<SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{F5CBCB6C-97C0-4AA5-8C5F-ED1E1574A602}"/>
+	</Class>
+
+  <Class Name="VCRX" Icon="Garage Sensor.ico" Description="Class for RadioRA2 Visor Control REceiver" ID="{51B7D06A-6588-4B9B-9BED-EC400D09E0DB}">
+    <SuperClass Name="Keypad" LinkObject="sys://Schema/RadioRA2/Keypad" ID="{3716BA66-5BE0-4E38-8888-A47AE0D116FC}"/>
+  </Class>
+
+  <Class Name="TableTopKeypad" Virtual="1" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{EA325E45-8A95-44FC-BA25-4392AD01E1F8}">
+		<SuperClass Name="Keypad" LinkObject="sys://Schema/RadioRA2/Keypad" ID="{D7F19D1E-C496-4D92-BE58-AE618C77C1BB}"/>
+	</Class>
+
+	<Class Name="T5RL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{BCFDC23B-B93D-4F89-BBFF-6F9117B596E4}">
+		<SuperClass Name="TableTopKeypad" LinkObject="sys://Schema/RadioRA2/TableTopKeypad" ID="{83F19C1C-3D9F-4373-94E4-19E64982BA00}"/>
+	</Class>
+
+	<Class Name="T10RL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{AC9BC45D-8100-409F-A318-204D14AFADE8}">
+		<SuperClass Name="TableTopKeypad" LinkObject="sys://Schema/RadioRA2/TableTopKeypad" ID="{DB1B5F3D-DD9A-430D-BB65-EBFD162153F6}"/>
+	</Class>
+
+	<Class Name="T15RL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{066DA02C-31E8-44DA-85FF-59B04322379B}">
+		<SuperClass Name="TableTopKeypad" LinkObject="sys://Schema/RadioRA2/TableTopKeypad" ID="{6CF50F50-CF93-4647-A65F-AB8F9706F9FF}"/>
+	</Class>
+
+	<Class Name="T15CRL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{84452D27-716E-4C65-BC75-AE1A163FFF18}">
+		<SuperClass Name="TableTopKeypad" LinkObject="sys://Schema/RadioRA2/TableTopKeypad" ID="{A01128E7-4394-425B-B956-A2C1BCF84583}"/>
+	</Class>
+
+	<Class Name="seeTouchKeypad" Virtual="1" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{806C1662-1701-47EF-881C-F31CAAB4F5A2}">
+		<SuperClass Name="Keypad" LinkObject="sys://Schema/RadioRA2/Keypad" ID="{64C7E398-9AAC-4D21-9007-6B0EEF38A3B8}"/>
+	</Class>
+
+	<Class Name="RRD_1RLD" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{26AB1CD2-CFCB-4819-9DA3-31033F310C2C}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{EC7C5B46-ABA3-44DC-8914-DF5069AF707D}"/>
+	</Class>
+	<Class Name="RRD_2RLD" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{EA08984C-1029-44F0-9B43-7C8EB5036FBB}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{D6504C7C-F641-4F1E-896D-E83F3B3A3887}"/>
+	</Class>
+	<Class Name="RRD_3BD" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{19C6006C-BF3E-4D77-9771-807B6CBC4E45}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{0D98A1E4-8504-45A9-89B2-354B5BAC50ED}"/>
+	</Class>
+	<Class Name="RRD_3BRL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{1D11E1CF-E6AC-4442-8281-4E1E9E827640}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{85D385B5-54E7-408E-9331-0D8F9837DD41}"/>
+	</Class>
+	<Class Name="RRD_3BSRL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{C9451B27-0A09-4F57-B956-8C66612D6CA2}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{F633461C-3E39-4E0D-A623-CE2FCCA95A82}"/>
+	</Class>
+	<Class Name="RRD_4S" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{BCAD926B-4015-41A0-B912-6B7FDCDFC287}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{D69B2E4B-BE07-4E75-B98A-0E76B81161B5}"/>
+	</Class>
+	<Class Name="RRD_5BRL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{63676496-5BA0-4E7C-812E-5E0A4296B864}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{ADA3DF7B-BD55-4F14-AA30-15E3F9DB8959}"/>
+	</Class>
+	<Class Name="RRD_6BRL" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{93B9B543-D04C-4EE7-B990-6521A0BC0DE0}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{7FE5573F-8303-4271-A247-FE00FE874A71}"/>
+	</Class>
+	<Class Name="RRD_7B" Icon="keypad.ico" Description="Class for RadioRA2 keypads" ID="{C56D461E-4162-4966-8E5D-73F3F4AD1DCA}">
+		<SuperClass Name="seeTouchKeypad" LinkObject="sys://Schema/RadioRA2/seeTouchKeypad" ID="{759C5DB9-8FC1-4D34-BC7A-B9DDCDB217B9}"/>
+	</Class>
+
+	<Class Name="PhantomLEDs" Description="Phantom LEDs on RadioRA2 main repeater" ID="{10175A5B-8252-4697-A5B2-D59EC2C5A34B}">
+		<SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{9C5B804B-620F-4DB7-91B1-88B8A0BA8214}"/>
+	</Class>
+		
+	<Class Name="PhantomButtons" Description="Phantom buttons on RadioRA2 main repeater" ID="{9EC4B431-4D0D-4B10-95C9-EEA3DE3BF5A2}">
+		<SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{67AAA094-E936-493B-AB10-84F39A4595BE}"/>
+		<SuperClass Name="KeypadDevice" LinkObject="sys://Schema/Device/Keypads/KeypadDevice" ID="{E3DD4F1C-6651-4052-80BA-7794946C088A}"/>
+	</Class>
+	<Class Name="Button" Description="Class for buttons on a RadioRA2 main repeater" Icon="keybutton.ico" ID="{61B9B212-EB91-40CB-B4CB-DB7D671026E7}">
+		<SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{195A156C-77E5-4AF2-9F9A-FDB07866C2C3}"/>
+		<SuperClass Name="Button" LinkObject="sys://Schema/Device/Button" ID="{E479904A-BE9C-4523-8F4B-0499CD59C173}"/>
+		<Property Name="ComponentNumber" Class="sys://Schema/System/Number" Description="Numerical ID of button" ReadOnly="True" ID="{5EE2A43A-187C-431F-92A9-13048A89CCBF}"/>
+		<Property Name="LEDComponentNumber" Class="sys://Schema/System/Number" Description="Numerical ID of LED" ReadOnly="True" ID="{08228953-465E-420E-A565-5F2B37750E87}"/>
+	</Class>
+
+  <Class Name="ButtonWithTrigger" Description="Class for buttons that can be triggered" Icon="keybutton.ico" ID="{89D4A967-A19A-4753-AA0E-1BB7B130A7B6}">
+    <SuperClass Name="Button" LinkObject="sys://Schema/RadioRA2/Button" ID="{E7E54F65-3B1D-415D-AB53-978E33D649ED}"/>
+    <SuperClass Name="ButtonTrigger" LinkObject="sys://Schema/Device/ButtonTrigger" ID="{80390B6E-9082-4D7F-867B-ED4ED3402471}"/>
+  </Class>
+
+  <Class Name="SimpleButton" Description="Class for buttons on a RadioRA2 main repeater" Icon="keybutton.ico" ID="{D5592794-506F-4A7B-93B3-971CF60FB76D}">
+		<SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{707CB75D-ABA7-413A-9064-789D2B28F39E}"/>
+		<SuperClass Name="Button" LinkObject="sys://Schema/Device/Button" ID="{594A4800-426D-4B95-B86A-E30A154EB059}"/>
+		<Property Name="ComponentNumber" Class="sys://Schema/System/Number" Description="Numerical ID of button" ReadOnly="True" ID="{BED928D0-2B68-4320-A98F-F4EFE6EFEB45}"/>
+	</Class>
+
+	<MergeEntry Name="Devices" InsertLocation="sys://Devices" ID="{62EC40A2-E2F6-42D1-9008-42430C763C00}">
+		<Object Name="RadioRA2" 
+			Description="Lutron RadioRA2 lighting controllers" 
+			Initialize="0" 
+			ID="{4285BA30-516D-4114-B58A-89AB8AC8C699}" 
+			Class="{5549B78A-9350-409E-9DC0-01C9F5F436C6}">   <!--The guid here must match the CLSID_RadioRA2 class above.-->
+		</Object>
+   </MergeEntry>
+
+</DriverLibrary>

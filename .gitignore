@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+#
+.vs/
+Debug/
+SPBond/Debug
+SPRadioRA2/Debug
+*.filters
+*.user
+HSDK/include/*.h
+HSDK/include/*.idl

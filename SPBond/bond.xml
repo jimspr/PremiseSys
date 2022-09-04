@@ -1,0 +1,90 @@
+<DriverLibrary Name="Bond" Description="Bond Driver" Version="1.1.1" ID="{9C47E085-1BAB-49B8-AA36-37DD2F2423CB}">
+
+  <!--Note: ID on the class name below is the clsid in the IDL file and also is specified on the "class" property on the merge entry below-->
+  <Class Name="Bond" Description="Top level class for Bond Subsystem" ID="{AF1A0E43-1209-44FC-A0C6-4783DADFDD15}">
+    <SuperClass Name="Subsystem" LinkObject="sys://Schema/System/Subsystem" ID="{36FDF658-5748-44E1-8217-6F142A240CD8}"/>
+    <SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{2FB9659E-6D4D-4605-B63C-5EB64A5B36EB}"/>
+    <ChildClass Name="Hub" Description="Bond Hub" LinkObject="sys://Schema/Bond/BondHub" ID="{9001D721-7F41-4775-9519-D66C1DF8D4FA}"/>
+  </Class>
+
+  <Class Name="BondHub" Icon="networks.ico" Description="Controller for Bond system" ID="{DA0E5E06-DA26-4474-9968-916496B39576}">
+    <SuperClass Name="Container" LinkObject="sys://Schema/System/Container" ID="{5FE3B1C2-49D0-4D02-8493-C0FC9A307453}"/>
+    <SuperClass Name="ExternalDevice" LinkObject="sys://Schema/Device/ExternalDevice" ID="{28BC5403-A88F-4A72-BC66-AC48A2AEE1C2}"/>
+    <Property Name="IPAddress" Class="sys://Schema/System/Text" Description="IP Address of the hub" ID="{9BEA15EF-E608-4A2A-8916-14AC95036E0D}"/>
+    <Property Name="IPPort" Class="sys://Schema/System/Number" DefaultValue="80" Description="IP Port number to use to connect with device." ID="{35D3201C-C067-49B9-8E97-9075EABC0F08}"/>
+    <Property Name="DiscoverToken" Class="sys://Schema/System/Boolean" Description="Discover bond token. Must be done within 10 minutes of turning on hub." Momentary="True" Persistent="False" ID="{499B7275-547B-4824-9379-7D9C03E373D2}"/>
+    <Property Name="BondToken" Class="sys://Schema/System/Text" Description="Bond Token for hub" ID="{EF001943-69A7-48A4-AB71-DB9730AC0153}"/>
+    <Property Name="DriverVersion" Class="sys://Schema/System/Text" ReadOnly="True" Description="Driver Version" ID="{D0E072FB-5495-47CF-9CC6-848E354D17E1}"/>
+    <Property Name="Firmware" Class="sys://Schema/System/Text" Description="Current firmware version number" ReadOnly="True" ID="{7435C4EE-FD61-4FC3-AF31-7F03699FBB64}"/>
+    <Property Name="DiscoverDevices" Class="sys://Schema/System/Boolean" Description="Discover devices." Momentary="True" Persistent="False" ID="{2918CF85-8E8B-4329-A408-5B2653ADC9E2}"/>
+    <!-- Because this device doesn't use the Premise port mechanism, the port spy feature doesn't work. We will at least dump the last response from the hub here thought. -->
+    <Property Name="LastResponse" Class="sys://Schema/System/Text" Persistent="False" Description="Last response from hub." ID="{9B0407AB-12D9-4526-AFC6-F8DC6DFD34D6}" />
+
+    <ChildClass Name="CeilingFan" LinkObject="sys://Schema/Bond/CeilingFan" ID="{FBA38CB8-B602-4942-AEBE-8EDB818EAD3A}"/>
+  </Class>
+
+  <!-- BondDevice is the base class for all bond devices. -->
+  <!-- TODO - Add support for capturing all actions supported and exposing as children that can be triggered. -->
+  <Class Name="BondDevice" Description="Class for Bond devices" ID="{57888E4A-41DC-47DA-9FE4-E568749CBB6B}">
+    <Property Name="DeviceID" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{E24552A6-F8CA-4D6B-9E87-98E41802ABE0}" />
+    <Property Name="BondName" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{B5669F7D-9112-4188-93ED-86A13057EC24}" />
+    <Property Name="BondType" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{FE7D419E-CC37-4D78-9024-538386DB4264}" />
+    <Property Name="Location" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{C70B03E6-2607-4453-92CF-1B1E4E3A0B51}" />
+    <Property Name="Template" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{1C0B2F53-269B-4AAA-8339-15EDC6089C7F}" />
+  </Class>
+
+  <Class Name="CeilingFan" Icon="fan.ico" Description="Bond ceiling fan control" ID="{84F95244-AC52-4AFF-84FF-74FB6632EF46}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{A8746B6D-B9B4-4408-A4C1-378737360D7E}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{01A7C938-E25D-46E3-9F57-E7A1E5FD37F5}"/>
+    <SuperClass Name="Fan" LinkObject="sys://Schema/Device/Fan" ID="{C0821F8A-0E47-4114-9A19-81CDDC514BE4}"/>
+    <SuperClass Name="Power" LinkObject="sys://Schema/Device/Power" ID="{0A6F965A-2993-4B7F-97A1-48BAE50EE883}"/>
+    <!-- The base Fan class represents speed as a percentage. The D1 fan has three speeds and off. -->
+    <Property Name="SpeedSetting" Class="sys://Schema/System/MultiValue" Description="Fan speed" ID="{6052C373-FC8C-46A7-B600-BEAFFBC3D09C}" >
+      <Enum Name="Off" Value="0" ID="{6ABC648C-FF2E-4DF4-BE52-A346A94FF197}"/>
+      <Enum Name="Low" Value="33" ID="{462ACE7E-CF76-4298-955D-07B1C19C0B3F}"/>
+      <Enum Name="Medium" Value="67" ID="{CC855676-FFF7-4417-9A78-BF2D25701AA0}"/>
+      <Enum Name="High" Value="100" ID="{EDC5A057-B44D-4AD0-94C0-DA3D35498758}"/>
+    </Property>
+  </Class>
+
+  <Class Name="Fireplace" Icon=".ico" Description="" ID="{83E6BDC7-BEB0-43D8-8276-08F1F7854AD1}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{B0CF863A-81BE-485C-9393-E0B1836F657C}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{7F334E61-8CE5-4E3B-A0EB-8ED3CC68674C}"/>
+  </Class>
+
+  <Class Name="Shade" Icon="blind.ico" Description="" ID="{C22E00CE-43B6-4343-88BB-542E1F3DFBB4}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{2DDAF7FF-8B6F-44BC-AC92-1CBFB02A85EB}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{E7876F1E-44CC-48FF-B9C5-C27C8217F5FE}"/>
+  </Class>
+
+  <Class Name="GenericDevice" Icon="power.ico" Description="" ID="{0EA44690-D329-468A-9703-1FADAE83AA12}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{3D7F6401-82EB-4974-9491-AD2934C0AF21}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{EC6C1712-4DCE-4988-8A48-3B8DBAE39FC7}"/>
+  </Class>
+
+  <Class Name="Light" Icon="light.ico" Description="" ID="{F65F8DB2-619A-49D5-ACE5-740E3DED7076}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{4A8382CE-C14E-4CB9-A617-748A97466426}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{C4BDE820-DB7A-49CC-B5A8-40FD9EF7ED51}"/>
+  </Class>
+
+  <Class Name="Bidet" Icon="bathroom.ico" Description="" ID="{CC0AE202-C3D1-47DF-AF4C-F572D721EA6A}">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{A60F88CD-A58B-4BEF-8220-34978A04616B}"/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{1AFAC749-F078-4EC5-A5CC-832D81E9BD16}"/>
+  </Class>
+
+  <!--<Class Name="" Icon=".ico" Description="" ID="">
+    <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID=""/>
+    <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID=""/>
+  </Class>-->
+
+  <MergeEntry Name="Devices" InsertLocation="sys://Devices" ID="{F428F199-4D28-4BE9-895B-8A891933091D}">
+    <Object Name="Bond"
+      Description="Bond RF controllers"
+      Initialize="0"
+      ID="{B208366C-E9BB-4B0A-BD42-8EE4636AF6EE}"
+      Class="{AF1A0E43-1209-44FC-A0C6-4783DADFDD15}">
+      <!--The guid here must match the Bond class above.-->
+    </Object>
+  </MergeEntry>
+
+</DriverLibrary>

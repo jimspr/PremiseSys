@@ -1,0 +1,5 @@
+LIBRARY      "SPRadioRA2.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
