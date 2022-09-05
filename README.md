@@ -1,7 +1,7 @@
 # PremiseSys
 Drivers for Premise SYS home automation software.
 
-#Install and configure required components.
+# Install and configure required components.
 I have been building with Visual Studio 2019, although 2022 should work as well.
 
 The include files and sysuuid.lib are needed from the old driver SDK that was available. You can get it from the Wayback Machine at https://web.archive.org/web/20060513190224/http://www.premisesystems.com/downloads/hsdkinstall.exe. Run the EXE and install the SDK somewhere. Then, copy the contents of the include and lib folders from the installation to the HSDK\include and HSDK\lib folders in this project. You will need to make one edit to a file to get things to build.
@@ -18,18 +18,16 @@ The Bond devices use a non-persistent HTTP mechanism, which the original Premise
 vcpkg install curl
 vcpkg integrate install
 
-#Build
-Load the solution in Visual Studio and build. You will see some warnings, but the projects should build.
-
-#Install
-To install the files, launch an administrator command prompt.
-Stop the premise service by running "net stop prkernel".
+You will need to copy the libcurl binaries that you built from vcpkg.
 For debug builds, copy zlibd1.dll and libcurl-d.dll from vcpkg\installed\x86-windows\debug\bin to c:\program files(x86)\premise\sys\bin.
 For release builds, copy zlibd1.dll and libcurl.dll from vcpkg\installed\x86-windows\bin to c:\program files(x86)\premise\sys\bin.
-Copy spbond.dll, spbond.pdb, spradiora2.dll, and spradiora2.pdb to c:\program files(x86)\premise\sys\bin\devices.
-You only need to copy the zlibd1 and libcurl DLLs the first time, while the spbond.* and spradiora2.* files will need to be copied after each build.
-Start the premise service by running "net start prkernel".
-Launch SYS and look for the RadioRA2 and Bond devices.
 
-It is best to delete the slserver.xdo and slserver.psc files after making changes to the XML file and building a new version. After stopping the prkernel service, run the following command to remove the data.
-del "c:\Program Files (x86)\premise\sys\schema\slserver.*"
+# Build
+Load the solution in Visual Studio and build. You will see some warnings, but the projects should build.
+
+# Install Bond and RadioRA2 drivers
+To install the files, launch an administrator command prompt.
+You can use the upd.bat file to kill SYS, copy the bond and radiora2 driver DLLs and PDBs, optionally reset the Premise data, and relaunch the SYS service and client.
+For example, the following will copy the Debug binaries and reset all SYS data.
+upd.bat Debug reset
+You need to do this after building the drivers to copy them to the right location. You only need to add "reset" when you change one of the XML files. The reset argument makes sure the latext XML is loaded.

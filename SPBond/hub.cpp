@@ -95,7 +95,7 @@ HRESULT CBondHub::OnBrokerAttach()
 	}
 
 	/* This is here for testing, as it avoids me having to reeenter this info every time I try something. */
-#if 1
+#if 0
 	SetValue(m_spSite, L"IPAddress", CComVariant(L"192.168.1.30"));
 	SetValue(m_spSite, L"BondToken", CComVariant(L"be4cdfea4ca9033c"));
 #endif
@@ -360,6 +360,21 @@ HRESULT CBondHub::CreateDevice(const string& id)
 	return S_OK;
 }
 
+HRESULT CBondHub::CreateAction(IPremiseObject* p, const string& name)
+{
+	USES_CONVERSION;
+	CComPtr<IPremiseObject> spNew;
+
+	CComBSTR bstrName(name.c_str());
+	p->CreateEx(SVCC_NOTIFY | SVCC_EXIST, (BSTR)XML_Bond_Action, bstrName, &spNew);
+
+	if (spNew)
+	{
+	}
+
+	return S_OK;
+}
+
 HRESULT CBondHub::OnDiscoverDevicesChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (newValue.vt == VT_BOOL && newValue.boolVal == VARIANT_TRUE)
@@ -379,6 +394,88 @@ HRESULT CBondHub::OnDiscoverDevicesChanged(IPremiseObject* pObject, VARIANT newV
 	}
 	return S_OK;
 }
+
+HRESULT CBondHub::OnDiscoverActions(IPremiseObject* pObject, VARIANT newValue)
+{
+	USES_CONVERSION;
+	if (newValue.vt == VT_BOOL && newValue.boolVal == VARIANT_TRUE)
+	{
+		CComVariant varID;
+		if (SUCCEEDED(pObject->GetValue(L"DeviceID", &varID)))
+		{
+			string strCommand = "/v2/devices/";
+			strCommand += OLE2CA(varID.bstrVal);
+			strCommand += "/actions";
+			CComPtr<IPremiseObject> spObject{ pObject };
+			QueueWork([=]()
+			{
+				string output;
+				object_t obj;
+				InvokeCommand(strCommand.c_str(), output, obj, true /*use_token*/);
+				for (auto& item : obj.values)
+				{
+					ObjectLock lock(this);
+					if (item.first != "_")
+						CreateAction(spObject, item.first);
+				}
+			});
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CBondHub::OnTriggerAction(IPremiseObject* pObject, VARIANT newValue)
+{
+	USES_CONVERSION;
+	HRESULT hr = E_FAIL;
+	if (newValue.vt != VT_BOOL)
+		return hr;
+	if (newValue.boolVal != VARIANT_TRUE)
+		return S_OK;
+
+	// pObject is the action. Device is the parent.
+	CComPtr<IPremiseObject> spParent;
+	pObject->get_Parent(&spParent);
+	CComVariant varID;
+	hr = spParent->GetValue(L"DeviceID", &varID);
+	if (FAILED(hr))
+		return hr;
+
+	CComVariant varAction;
+	hr = pObject->GetValue(L"Name", &varAction);
+	if (FAILED(hr))
+		return hr;
+
+	CComVariant varArgs;
+	hr = pObject->GetValue(L"Argument", &varArgs);
+	if (FAILED(hr))
+		return hr;
+
+	string strCommand = "/v2/devices/";
+	strCommand += OLE2CA(varID.bstrVal);
+	strCommand += "/actions/";
+	strCommand += OLE2CA(varAction.bstrVal);
+
+	string strArgs;
+	if (*varArgs.bstrVal != 0) // If not empty, create arguments.
+	{
+		strArgs += "{\"argument\":";
+		strArgs += OLE2CA(varArgs.bstrVal);
+		strArgs += "}";
+	}
+	else
+		strArgs = "{}";
+
+	QueueWork([=]()
+	{
+		string output;
+		object_t obj;
+		InvokeAction(strCommand, strArgs);
+	});
+
+	return S_OK;
+}
+
 
 void CBondHub::UpdateVersion()
 {

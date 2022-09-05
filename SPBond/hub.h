@@ -20,6 +20,7 @@
 #define XML_Bond_GenericDevice	L"sys://Schema/Bond/GenericDevice"
 #define XML_Bond_Light			L"sys://Schema/Bond/Light"
 #define XML_Bond_Bidet			L"sys://Schema/Bond/Bidet"
+#define XML_Bond_Action			L"sys://Schema/Bond/Action"
 
 struct object_t;
 
@@ -65,6 +66,8 @@ BEGIN_NOTIFY_MAP(CBondHub)
 	NOTIFY_PROPERTY(L"SpeedSetting", OnFanSpeedSettingChanged)
 	NOTIFY_PROPERTY(L"Speed", OnFanSpeedChanged)
 	NOTIFY_PROPERTY(L"PowerState", OnPowerStateChanged)
+	NOTIFY_PROPERTY(L"DiscoverActions", OnDiscoverActions)
+	NOTIFY_PROPERTY(L"Trigger", OnTriggerAction)
 END_NOTIFY_MAP()
 
 	HRESULT OnDiscoverTokenChanged(IPremiseObject* pObject, VARIANT newValue);
@@ -73,12 +76,15 @@ END_NOTIFY_MAP()
 	HRESULT OnFanSpeedSettingChanged(IPremiseObject* pObject, VARIANT newValue);
 	HRESULT OnFanSpeedChanged(IPremiseObject* pObject, VARIANT newValue);
 	HRESULT OnPowerStateChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT OnDiscoverActions(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT OnTriggerAction(IPremiseObject* pObject, VARIANT newValue);
 
 	HRESULT GetDeviceID(IPremiseObject *pObject, std::string& str);
 	HRESULT OnBrokerAttach() override;
 	HRESULT OnBrokerDetach() override;
 	HRESULT GetBaseUrl(std::string& url);
 	HRESULT CreateDevice(const std::string& id);
+	HRESULT CreateAction(IPremiseObject* p, const std::string& name);
 	HRESULT SetDeviceInfo(CComPtr<IPremiseObject> spDevice, const object_t& obj);
 	HRESULT QueryStateOfDevices();
 

@@ -1,4 +1,4 @@
-<DriverLibrary Name="Bond" Description="Bond Driver" Version="1.1.1" ID="{9C47E085-1BAB-49B8-AA36-37DD2F2423CB}">
+<DriverLibrary Name="Bond" Description="Bond Driver" Version="1.1.2" ID="{9C47E085-1BAB-49B8-AA36-37DD2F2423CB}">
 
   <!--Note: ID on the class name below is the clsid in the IDL file and also is specified on the "class" property on the merge entry below-->
   <Class Name="Bond" Description="Top level class for Bond Subsystem" ID="{AF1A0E43-1209-44FC-A0C6-4783DADFDD15}">
@@ -31,6 +31,8 @@
     <Property Name="BondType" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{FE7D419E-CC37-4D78-9024-538386DB4264}" />
     <Property Name="Location" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{C70B03E6-2607-4453-92CF-1B1E4E3A0B51}" />
     <Property Name="Template" Class="sys://Schema/System/Text" Description="8/16 digit Bond ID" ID="{1C0B2F53-269B-4AAA-8339-15EDC6089C7F}" />
+    <Property Name="DiscoverActions" Class="sys://Schema/System/Boolean" Description="Discover actions." Momentary="True" Persistent="False" ID="{1FA3CEC8-8129-4040-9797-A4359F9F9599}"/>
+    <ChildClass Name="Action" Description="Action for Bond Device" LinkObject="sys://Schema/Bond/Action" ID="{AA8DB5B6-F84F-4E61-BF02-A8EE893D64E4}"/>
   </Class>
 
   <Class Name="CeilingFan" Icon="fan.ico" Description="Bond ceiling fan control" ID="{84F95244-AC52-4AFF-84FF-74FB6632EF46}">
@@ -47,29 +49,34 @@
     </Property>
   </Class>
 
-  <Class Name="Fireplace" Icon=".ico" Description="" ID="{83E6BDC7-BEB0-43D8-8276-08F1F7854AD1}">
+  <Class Name="Fireplace" Icon=".ico" Description="Fireplace Device" ID="{83E6BDC7-BEB0-43D8-8276-08F1F7854AD1}">
     <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{B0CF863A-81BE-485C-9393-E0B1836F657C}"/>
     <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{7F334E61-8CE5-4E3B-A0EB-8ED3CC68674C}"/>
   </Class>
 
-  <Class Name="Shade" Icon="blind.ico" Description="" ID="{C22E00CE-43B6-4343-88BB-542E1F3DFBB4}">
+  <Class Name="Shade" Icon="blind.ico" Description="Window Shade or Blind" ID="{C22E00CE-43B6-4343-88BB-542E1F3DFBB4}">
     <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{2DDAF7FF-8B6F-44BC-AC92-1CBFB02A85EB}"/>
     <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{E7876F1E-44CC-48FF-B9C5-C27C8217F5FE}"/>
   </Class>
 
-  <Class Name="GenericDevice" Icon="power.ico" Description="" ID="{0EA44690-D329-468A-9703-1FADAE83AA12}">
+  <Class Name="GenericDevice" Icon="power.ico" Description="Generic Bond Device" ID="{0EA44690-D329-468A-9703-1FADAE83AA12}">
     <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{3D7F6401-82EB-4974-9491-AD2934C0AF21}"/>
     <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{EC6C1712-4DCE-4988-8A48-3B8DBAE39FC7}"/>
   </Class>
 
-  <Class Name="Light" Icon="light.ico" Description="" ID="{F65F8DB2-619A-49D5-ACE5-740E3DED7076}">
+  <Class Name="Light" Icon="light.ico" Description="Light Device" ID="{F65F8DB2-619A-49D5-ACE5-740E3DED7076}">
     <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{4A8382CE-C14E-4CB9-A617-748A97466426}"/>
     <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{C4BDE820-DB7A-49CC-B5A8-40FD9EF7ED51}"/>
   </Class>
 
-  <Class Name="Bidet" Icon="bathroom.ico" Description="" ID="{CC0AE202-C3D1-47DF-AF4C-F572D721EA6A}">
+  <Class Name="Bidet" Icon="bathroom.ico" Description="Bidet" ID="{CC0AE202-C3D1-47DF-AF4C-F572D721EA6A}">
     <SuperClass Name="Binding" LinkObject="sys://Schema/System/BindingTarget" ID="{A60F88CD-A58B-4BEF-8220-34978A04616B}"/>
     <SuperClass Name="Device" LinkObject="sys://Schema/Bond/BondDevice" ID="{1AFAC749-F078-4EC5-A5CC-832D81E9BD16}"/>
+  </Class>
+
+  <Class Name="Action" Icon="action_toggle.ico" Description="A triggerable action." ID="{0097AEE7-01F9-4F80-82B9-616424499FB2}">
+    <Property Name="Argument" Class="sys://Schema/System/Text" DefaultValue="" Description="Optional argument provided to action. Some actions have no arguments." ID="{A9DF4C52-4A21-4531-92FE-2736238E2A61}" />
+    <Boolean Name="Trigger" Persistent="False" Momentary="True" Description="Set this to true to fire the script" DefaultValue="False" ID="{C2C545B0-E065-408F-8D5F-544701ECA380}"/>
   </Class>
 
   <!--<Class Name="" Icon=".ico" Description="" ID="">

@@ -34,6 +34,7 @@
 #
 .vs/
 Debug/
+Release/
 SPBond/Debug
 SPRadioRA2/Debug
 *.filters
