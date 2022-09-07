@@ -1,4 +1,4 @@
-// RadioRA.cpp : Implementation of CRadioRA
+// hub.cpp : Implementation of CBondHub
 #include "pch.h"
 #include "hub.h"
 #include <string>
@@ -69,6 +69,7 @@ void CBondHub::Worker()
 	}
 }
 
+// This will put work on a worker queue to be processed by worker thread. Prevent hanging current thread.
 void CBondHub::QueueWork(std::function<void(void)>&& fn)
 {
 	m_mutex.lock();
@@ -119,15 +120,7 @@ HRESULT CBondHub::OnBrokerDetach()
 
 HRESULT CBondHub::GetDeviceID(IPremiseObject *pObject, string& str)
 {
-	USES_CONVERSION;
-	CComVariant var;
-	HRESULT hr = pObject->GetValue((BSTR)L"DeviceID", &var);
-	if (FAILED(hr))
-		return hr;
-	if (var.vt != VT_BSTR)
-		return E_FAIL;
-	str = OLE2CA(var.bstrVal);
-	return S_OK;
+	return GetValue(pObject, L"DeviceID", str);
 }
 
 void CBondHub::SendFan(IPremiseObject* pObject, long percent)
@@ -197,14 +190,11 @@ HRESULT CBondHub::QueryStateOfDevices()
 		CComPtr<IPremiseObjectCollection> spProperties;
 		if (IsObjectOfExplicitType(spItem, XML_Bond_CeilingFan))
 		{
-			CComVariant varRoom;
-			HRESULT hr = spItem->GetValue(L"DeviceID", &varRoom);
+			string strID;
+			HRESULT hr = GetDeviceID(spItem, strID);
 			if (FAILED(hr))
 				return hr;
-	//		long nID = varRoom.lVal;
-	//		char buf[64];
-	//		wsprintfA(buf, "?OUTPUT,%d,1\r\n", nID);
-	//		SendBufferedCommand(buf);
+			// TODO - Query state variables?
 		}
 	}
 	return S_OK;
@@ -257,15 +247,11 @@ HRESULT CBondHub::OnPowerStateChanged(IPremiseObject* pObject, VARIANT newValue)
 HRESULT CBondHub::GetBaseUrl(string& url)
 {
 	url.clear();
-	USES_CONVERSION;
-	CComVariant var;
-	HRESULT hr = m_spSite->GetValue((BSTR)L"IPAddress", &var);
+	string strAddress;
+	HRESULT hr = GetValue(m_spSite, L"IPAddress", strAddress);
 	if (FAILED(hr))
 		return hr;
-	if (var.vt != VT_BSTR)
-		return E_FAIL;
-	url = "http://";
-	url += OLE2CA(var.bstrVal);
+	url = "http://" + strAddress;
 
 	return S_OK;
 }
@@ -400,12 +386,10 @@ HRESULT CBondHub::OnDiscoverActions(IPremiseObject* pObject, VARIANT newValue)
 	USES_CONVERSION;
 	if (newValue.vt == VT_BOOL && newValue.boolVal == VARIANT_TRUE)
 	{
-		CComVariant varID;
-		if (SUCCEEDED(pObject->GetValue(L"DeviceID", &varID)))
+		string strID;
+		if (SUCCEEDED(GetDeviceID(pObject, strID)))
 		{
-			string strCommand = "/v2/devices/";
-			strCommand += OLE2CA(varID.bstrVal);
-			strCommand += "/actions";
+			string strCommand = "/v2/devices/" + strID + "/actions";
 			CComPtr<IPremiseObject> spObject{ pObject };
 			QueueWork([=]()
 			{
@@ -436,33 +420,26 @@ HRESULT CBondHub::OnTriggerAction(IPremiseObject* pObject, VARIANT newValue)
 	// pObject is the action. Device is the parent.
 	CComPtr<IPremiseObject> spParent;
 	pObject->get_Parent(&spParent);
-	CComVariant varID;
-	hr = spParent->GetValue(L"DeviceID", &varID);
+	string strID;
+	hr = GetDeviceID(spParent, strID);
 	if (FAILED(hr))
 		return hr;
 
-	CComVariant varAction;
-	hr = pObject->GetValue(L"Name", &varAction);
+	string strAction;
+	hr = GetValue(pObject, L"Name", strAction);
 	if (FAILED(hr))
 		return hr;
 
-	CComVariant varArgs;
-	hr = pObject->GetValue(L"Argument", &varArgs);
+	string strArgument;
+	hr = GetValue(pObject, L"Argument", strArgument);
 	if (FAILED(hr))
 		return hr;
 
-	string strCommand = "/v2/devices/";
-	strCommand += OLE2CA(varID.bstrVal);
-	strCommand += "/actions/";
-	strCommand += OLE2CA(varAction.bstrVal);
+	string strCommand = "/v2/devices/" + strID + "/actions/" + strAction;
 
 	string strArgs;
-	if (*varArgs.bstrVal != 0) // If not empty, create arguments.
-	{
-		strArgs += "{\"argument\":";
-		strArgs += OLE2CA(varArgs.bstrVal);
-		strArgs += "}";
-	}
+	if (!strArgument.empty()) // If not empty, create arguments.
+		strArgs = "{\"argument\":" + strArgument + "}";
 	else
 		strArgs = "{}";
 
@@ -498,6 +475,19 @@ void CBondHub::SetValueA(const wchar_t* name, const char* value)
 	::SetValue(m_spSite, (BSTR)name, varOutput);
 }
 
+// Adds the Bond token to the CURL header.
+void CBondHub::AddTokenToHeader(CURL* curl)
+{
+	string strToken;
+	if (SUCCEEDED(GetValue(m_spSite, L"BondToken", strToken)))
+	{
+		curl_slist* list = nullptr;
+		string header = "BOND-Token: " + strToken;
+		list = curl_slist_append(list, header.c_str());
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+	}
+}
+
 void CBondHub::InvokeCommand(const char* command, string& output, object_t& obj, bool use_token)
 {
 	// Make sure we are on worker thread.
@@ -515,18 +505,7 @@ void CBondHub::InvokeCommand(const char* command, string& output, object_t& obj,
 		url += command;
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		if (use_token)
-		{
-			CComVariant varToken;
-			if (SUCCEEDED(m_spSite->GetValue((BSTR)L"BondToken", &varToken)))
-			{
-				USES_CONVERSION;
-				curl_slist* list = nullptr;
-				string header = "BOND-Token: ";
-				header += OLE2CA(varToken.bstrVal);
-				list = curl_slist_append(list, header.c_str());
-				curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-			}
-		}
+			AddTokenToHeader(curl);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &output);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
 
@@ -563,16 +542,7 @@ void CBondHub::InvokeAction(const string& action, const string& payload)
 	{
 		url += action;
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-		CComVariant varToken;
-		if (SUCCEEDED(m_spSite->GetValue((BSTR)L"BondToken", &varToken)))
-		{
-			USES_CONVERSION;
-			curl_slist* list = nullptr;
-			string header = "BOND-Token: ";
-			header += OLE2CA(varToken.bstrVal);
-			list = curl_slist_append(list, header.c_str());
-			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-		}
+		AddTokenToHeader(curl);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &output);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
 	

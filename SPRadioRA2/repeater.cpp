@@ -168,11 +168,6 @@ HRESULT CMainRepeater::OnBrokerAttach()
 		// add phantom buttons
 		CreatePhantomButtons(spNew);
 
-		// add Zones
-//		CreateZones(m_spSite);
-
-		// add keypads
-//		CreateKeypads(m_spSite);
 	} while (0);
 	m_spSite->TransactionCommit();
 
@@ -235,47 +230,32 @@ HRESULT CMainRepeater::GetButtonAddress(IPremiseObject *pObject, long* pl)
 	pl[0] = 0;
 	pl[1] = 0;
 	CComVariant var;
-	HRESULT hr = pObject->GetValue((BSTR)L"ButtonID", &var);
+	HRESULT hr = GetValue(pObject, L"ButtonID", pl[1]);
 	if (FAILED(hr))
 		return hr;
-	pl[1] = var.lVal;
 	CComPtr<IPremiseObject> spParent;
 	hr = pObject->get_Parent(&spParent);
 	if (FAILED(hr))
 		return hr;
 
-	hr = spParent->GetValue((BSTR)L"ControlNumber", &var);
+	hr = GetValue(spParent, L"ControlNumber", pl[0]);
 	if (FAILED(hr))
 		return hr;
-	pl[0] = var.lVal;
 	return S_OK;
 }
 
 HRESULT CMainRepeater::GetDeviceID(IPremiseObject *pObject, long& l)
 {
 	l = 0;
-	CComVariant var;
-	HRESULT hr = pObject->GetValue((BSTR)L"DeviceID", &var);
+	HRESULT hr = GetValue(pObject, L"DeviceID", l);
 	if (FAILED(hr))
 		return hr;
-	var.ChangeType(VT_I4);
-	//if ((var.lVal < 1) || (var.lVal > 100))
-	//	return E_INVALIDARG;
-	l = var.lVal;
 	return S_OK;
 }
 
 HRESULT CMainRepeater::GetFadeTime(IPremiseObject* pObject, double& seconds)
 {
-	CComVariant varFade;
-	pObject->GetValue((BSTR)L"FadeTime", &varFade);
-	seconds = 0.0f;
-
-	if (varFade.vt == VT_R8)
-	{
-		seconds = varFade.dblVal;
-	}
-	return S_OK;
+	return GetValue(pObject, L"FadeTime", seconds);
 }
 
 HRESULT CMainRepeater::GetFadeTime(IPremiseObject* pObject, char buf[64])
@@ -861,11 +841,10 @@ HRESULT CMainRepeater::QueryStateOfDevices()
 		CComPtr<IPremiseObjectCollection> spProperties;
 		if (IsObjectOfExplicitType(spItem, XML_RadioRA2_RadioPowrSavr))
 		{
-			CComVariant varRoom;
-			HRESULT hr = spItem->GetValue((BSTR)L"RoomID", &varRoom);
+			long nID;
+			HRESULT hr = GetValue(spItem, L"RoomID", nID);
 			if (FAILED(hr))
 				return hr;
-			long nID = varRoom.lVal;
 			char buf[64];
 			wsprintfA(buf, "?GROUP,%d,3\r\n", nID);
 			SendBufferedCommand(buf);
@@ -876,11 +855,10 @@ HRESULT CMainRepeater::QueryStateOfDevices()
 			IsObjectOfExplicitType(spItem, XML_RadioRA2_DIMMER)
 			)
 		{
-			CComVariant varRoom;
-			HRESULT hr = spItem->GetValue((BSTR)L"DeviceID", &varRoom);
+			long nID;
+			HRESULT hr = GetValue(spItem, L"DeviceID", nID);
 			if (FAILED(hr))
 				return hr;
-			long nID = varRoom.lVal;
 			char buf[64];
 			wsprintfA(buf, "?OUTPUT,%d,1\r\n", nID);
 			SendBufferedCommand(buf);
@@ -947,23 +925,19 @@ HRESULT CMainRepeater::OnTriggerChanged(IPremiseObject *pObject, VARIANT newValu
 		if (newValue.vt != VT_BOOL)
 			return E_INVALIDARG;
 
-		CComVariant varButton;
-		HRESULT hr = pObject->GetValue((BSTR)L"ComponentNumber", &varButton);
+		long nComponentID;
+		HRESULT hr = GetValue(pObject, L"ComponentNumber", nComponentID);
 		if (FAILED(hr))
 			return hr;
-
-		long nComponentID = varButton.lVal;
 
 		long nID = 1; // Repeater if phantom button
 		CComPtr<IPremiseObject> spParent;
 		pObject->get_Parent(&spParent);
 		if (IsObjectOfExplicitType(spParent, XML_Keypad))
 		{
-			CComVariant varID;
-			hr = spParent->GetValue((BSTR)L"DeviceID", &varID);
+			hr = GetValue(spParent, L"DeviceID", nID);
 			if (FAILED(hr))
 				return hr;
-			nID = varID.lVal;
 		}
 
 		char buf[64];
@@ -984,8 +958,8 @@ HRESULT CMainRepeater::OnFlashChanged(IPremiseObject *pObject, VARIANT newValue)
 	if (newValue.vt != VT_BOOL)
 		return E_INVALIDARG;
 
-	CComVariant varID;
-	HRESULT hr = pObject->GetValue((BSTR)L"DeviceID", &varID);
+	long deviceID;
+	HRESULT hr = GetValue(pObject, L"DeviceID", deviceID);
 	if (FAILED(hr))
 		return hr;
 
@@ -1000,9 +974,9 @@ HRESULT CMainRepeater::OnFlashChanged(IPremiseObject *pObject, VARIANT newValue)
 	if (flash)
 	{
 		if (time < .25f)
-			sprintf(buf, "#OUTPUT,%d,5\r\n", varID.lVal);
+			sprintf(buf, "#OUTPUT,%d,5\r\n", deviceID);
 		else
-			sprintf(buf, "#OUTPUT,%d,5,%.2f\r\n", varID.lVal, time);
+			sprintf(buf, "#OUTPUT,%d,5,%.2f\r\n", deviceID, time);
 		SendBufferedCommand(buf);
 	}
 	else
@@ -1054,6 +1028,12 @@ HRESULT CMainRepeater::OnObjectCreated(IPremiseObject *pContainer, IPremiseObjec
 		CreateVCRX(pCreatedObject);
 	return S_OK;
 }
+
+HRESULT CMainRepeater::OnObjectDeleted(IPremiseObject* pContainer, IPremiseObject* pDeletedObject)
+{
+	return S_OK;
+}
+
 
 static void CreateSimpleButton(IPremiseObject* pObject, LPCWSTR name, int component)
 {
@@ -1155,18 +1135,6 @@ HRESULT CMainRepeater::CreateTableTopButtons(IPremiseObject* pObject, int nButto
 
 	return S_OK;
 }
-
-HRESULT CMainRepeater::CreateZones(IPremiseObject* pObject)
-{
-	SUBFOLDER arrZones[] =
-	{
-		{1, SVCC_FIXED | SVCC_EXIST | SVCC_NOTIFY, XML_RadioRA2_Zones, L"Zones", false, 0, NULL, 0},
-		{32, SVCC_EXIST | SVCC_NOTIFY, XML_RadioRA2_DIMMER, L"Zone", true, 1, L"Zone", 1}
-	};
-	HRESULT hr = CreateSubFolderTree(pObject, arrZones, 2);
-	return hr;
-}
-
 
 HRESULT CMainRepeater::CreatePhantomButtons(IPremiseObject* pObject)
 {

@@ -183,11 +183,7 @@ END_NOTIFY_MAP()
 	HRESULT STDMETHODCALLTYPE OnFlashChanged(IPremiseObject *pObject, VARIANT newValue);
 	HRESULT STDMETHODCALLTYPE OnButtonsChanged(IPremiseObject *pObject, VARIANT newValue);
 	HRESULT STDMETHODCALLTYPE OnObjectCreated(IPremiseObject *pContainer, IPremiseObject *pCreatedObject);
-
-	HRESULT STDMETHODCALLTYPE OnObjectDeleted(IPremiseObject *pContainer, IPremiseObject *pDeletedObject)
-	{
-		return S_OK;
-	}
+	HRESULT STDMETHODCALLTYPE OnObjectDeleted(IPremiseObject* pContainer, IPremiseObject* pDeletedObject);
 
 	void UpdateFirmware(LPCSTR psz);
 	void UpdateOutput(LPCSTR psz);
@@ -199,20 +195,6 @@ END_NOTIFY_MAP()
 	HRESULT GetSensorByRoomID(unsigned int id, IPremiseObject** ppObject);
 	HRESULT GetObjectByComponent(unsigned int id, unsigned int component, IPremiseObject** ppObject);
 
-#if 0
-	static HRESULT CreateKeypads(IPremiseObject* pObject)
-	{
-		SUBFOLDER arrZones[] = 
-		{
-			{1, SVCC_FIXED | SVCC_EXIST | SVCC_NOTIFY, XML_RadioRA2_Keypads, L"Keypads", false, 0, NULL, 0},
-			{12, SVCC_EXIST | SVCC_NOTIFY, XML_RadioRA2_Master, L"MasterControl", true, 1, L"ControlNumber", 1}
-		};
-		HRESULT hr = CreateSubFolderTree(pObject, arrZones, 2);
-		return hr;
-	}
-#endif
-
-	static HRESULT CreateZones(IPremiseObject* pObject);
 	static HRESULT CreatePhantomButtons(IPremiseObject* pObject);
 	static HRESULT CreateTableTopButtons(IPremiseObject* pObject, int nButtons);
 	static HRESULT CreateKeypadButtons(IPremiseObject* pObject, Keypads kp);

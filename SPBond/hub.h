@@ -1,4 +1,4 @@
-// Bond.h : Declaration of the CBond
+// Bond.h : Declaration of the CBondHub
 
 #pragma once
 
@@ -94,4 +94,5 @@ END_NOTIFY_MAP()
 	void InvokeAction(const std::string& action, const std::string& payload);
 	void SendFan(IPremiseObject* pObject, long nLevel);
 	void SendPower(IPremiseObject* pObject, bool state);
+	void AddTokenToHeader(void* curl);
 };
