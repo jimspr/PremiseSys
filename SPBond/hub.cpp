@@ -60,9 +60,10 @@ void CBondHub::Worker()
 			auto& f = m_workItems.front();
 			// Release lock while running function.
 			lock.unlock();
+			// Note that reference to front is not invalidated when adding to back.
 			f();
-			m_workItems.pop_front();
 			lock.lock();
+			m_workItems.pop_front();
 		}
 		if (m_stopThread)
 			return;
