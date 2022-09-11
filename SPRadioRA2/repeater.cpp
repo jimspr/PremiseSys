@@ -62,23 +62,11 @@ typedef void (CMainRepeater::* MFP)(LPCSTR psz);
 // This table defines what to do with data coming from the repeater
 JumpTableEntry<MFP> arrJT[] =
 {
-	{"GNET> ", &CMainRepeater::UpdateGNET},
 	{"OS Firmware Revision = ", &CMainRepeater::UpdateFirmware},
 	{"~OUTPUT,", &CMainRepeater::UpdateOutput},
 	{"~DEVICE,", &CMainRepeater::UpdateDevice},
 	{"~SYSTEM,", &CMainRepeater::UpdateSystem},
 	{"~GROUP,", &CMainRepeater::UpdateGroup},
-	{NULL, NULL}
-};
-
-// The prompts table is to handle logging into the repeater
-typedef void (CMainRepeater::* VFP)();
-JumpTableEntry<VFP> prompts[] =
-{
-	{"GNET> ", &CMainRepeater::OnGNET},
-	{"login: ", &CMainRepeater::OnLogin},
-	{"password: ", &CMainRepeater::OnPassword},
-	{"\r\n", &CMainRepeater::OnConsume},
 	{NULL, NULL}
 };
 
@@ -418,12 +406,6 @@ void CMainRepeater::UpdateFirmware(LPCSTR psz)
 	SetValue(m_spSite, L"Firmware", CComVariant(psz));
 }
 
-// We sometimes get "GNET >\0", which comes through here.
-void CMainRepeater::UpdateGNET(LPCSTR)
-{
-	OnGNET();
-}
-
 void CMainRepeater::OnGNET()
 {
 	if (!m_fReady)
@@ -456,49 +438,63 @@ void CMainRepeater::OnPassword()
 	// When "GNET>" is seen then we will be ready
 }
 
-void CMainRepeater::OnConsume()
+unsigned long CMainRepeater::ProcessPrompt(const char* psz)
 {
+	static const std::string strGnet{ "GNET> " };
+	static const std::string strLogin{ "login: " };
+	static const std::string strPassword{ "password: " };
+
+	if (strGnet == psz)
+	{
+		OnGNET();
+		return strGnet.size();
+	}
+	else if (strLogin == psz)
+	{
+		OnLogin();
+		return strLogin.size();
+	}
+	else if (strPassword == psz)
+	{
+		OnPassword();
+		return strPassword.size();
+	}
+
+	return 0;
 }
 
 unsigned long CMainRepeater::ProcessReadBuffer(BYTE* pBuf, DWORD dw, IPremisePort* pPort)
 {
 	pBuf[dw] = 0; // null terminate
 	BYTE* cur = pBuf;
-	DWORD consumed = 0;
 	bool fContinue = true;
+	int left = dw;
 
-	while (fContinue && (consumed < dw))
+	while (fContinue && (left > 0))
 	{
 		fContinue = false;
 
-		unsigned long ret = CPremiseBufferedPortDevice::ProcessReadBuffer(cur, dw - consumed, pPort);
+		unsigned long ret = CPremiseBufferedPortDevice::ProcessReadBuffer(cur, left, pPort);
 		if (ret != 0)
 		{
 			fContinue = true;
 			cur += ret;
-			consumed += ret;
+			left -= ret;
 		}
 
-		LPCSTR psz = (const char*)cur;
-		// See if we have a prompt to deal with
-		JumpTableEntry<VFP>* pentries = prompts;
-		while (pentries->psz)
+		// Prompts don't have a newline at the end, so we have to handle them directly.
+		ret = ProcessPrompt((const char*)cur);
+		if (ret != 0)
 		{
-			if (lstrcmpA(pentries->psz, psz) == 0)
-			{
-				VFP fp = pentries->pfn;
-				(this->*fp)();
-				ret += lstrlenA(pentries->psz);
-				cur += ret;
-				consumed += ret;
-				fContinue = true;
-				break;
-			}
-			pentries++;
+			fContinue = true;
+			cur += ret;
+			left -= ret;
+			_ASSERTE(left == 0);
 		}
+		_ASSERTE(left >= 0);
 	}
 
-	return consumed;
+	return cur - pBuf; // Consumed
 }
 
 static LPCSTR NextField(LPCSTR psz)
@@ -978,10 +974,25 @@ HRESULT CMainRepeater::OnFlashChanged(IPremiseObject* pObject, VARIANT newValue)
 		else
 			sprintf(buf, "#OUTPUT,%d,5,%.2f\r\n", deviceID, time);
 		SendBufferedCommand(buf);
+		/* Note: I'm seeing weird behavior where all my lamp dimmers start flashing whenever any zone is 
+		   flashed. The lamp dimmers will continue flashing until they are sent a command or manually 
+		   controlled. This appears to be a firmware issue and not related to what is being sent. */
 	}
 	else
 	{
-		SendDim(pObject, 100);
+		if (IsObjectOfExplicitType(pObject, XML_RadioRA2_SWITCH))
+		{
+			CComVariant var;
+			pObject->GetValue(L"PowerState", &var);
+			SendSwitch(pObject, var.boolVal);
+		}
+		else if (IsObjectOfExplicitType(pObject, XML_RadioRA2_DIMMER))
+		{
+			CComVariant var;
+			pObject->GetValue(L"Brightness", &var);
+			long nBright = (int)(var.dblVal * 100. + .5);
+			SendDim(pObject, nBright);
+		}
 	}
 	return S_OK;
 }

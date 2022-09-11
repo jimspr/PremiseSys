@@ -143,6 +143,7 @@ public:
 	HRESULT OnBrokerAttach() override;
 	void ProcessLine(LPCSTR psz);
 	virtual unsigned long ProcessReadBuffer(BYTE* pBuf, DWORD dw, IPremisePort* pPort);
+	unsigned long ProcessPrompt(const char* psz);
 	HRESULT OnConfigurePort(IPremiseObject* pPort) override;
 	HRESULT OnDeviceState(DEVICE_STATE ps) override;
 
@@ -214,8 +215,6 @@ public:
 	HRESULT QueryStateOfDevices();
 
 	void OnGNET();
-	void UpdateGNET(LPCSTR psz);
 	void OnLogin();
 	void OnPassword();
-	void OnConsume();
 };
