@@ -2,6 +2,29 @@
 #include <string>
 
 // Some helpers to avoid errors with passing literals as non-const and and temporary CComVariants as non-const.
+inline HRESULT SetValue(IPremiseObject* p, const char* name, const char* value)
+{
+	USES_CONVERSION;
+	CComBSTR bstrName{ name };
+	CComVariant varOutput(A2COLE(value));
+	return p->SetValue(bstrName, &varOutput);
+}
+
+inline HRESULT SetValue(IPremiseObject* p, const char* name, const std::string& value)
+{
+	USES_CONVERSION;
+	CComBSTR bstrName{ name };
+	CComVariant varOutput(A2COLE(value.c_str()));
+	return p->SetValue(bstrName, &varOutput);
+}
+
+inline HRESULT SetValue(IPremiseObject* p, const char* name, bool value)
+{
+	USES_CONVERSION;
+	CComBSTR bstrName{ name };
+	CComVariant varOutput(value);
+	return p->SetValue(bstrName, &varOutput);
+}
 
 inline HRESULT SetValue(IPremiseObject* p, LPCOLESTR name, const CComVariant& var)
 {

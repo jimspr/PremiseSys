@@ -11,12 +11,11 @@
 
 using namespace std;
 
-
 static bool IsObjectOfType(IPremiseObject* pObject, BSTR bstrClassName)
 {
 	VARIANT_BOOL bType = VARIANT_FALSE;
 	HRESULT hr = pObject->IsOfType(bstrClassName, &bType);
-	if(SUCCEEDED(hr) && bType)
+	if (SUCCEEDED(hr) && bType)
 		return true;
 	return false;
 }
@@ -98,8 +97,8 @@ HRESULT CBondHub::OnBrokerAttach()
 
 	/* This is here for testing, as it avoids me having to reeenter this info every time I try something. */
 #if 0
-	SetValue(m_spSite, L"IPAddress", CComVariant(L"192.168.1.30"));
-	SetValue(m_spSite, L"BondToken", CComVariant(L"be4cdfea4ca9033c"));
+	SetValue(m_spSite, "IPAddress", "192.168.1.30");
+	SetValue(m_spSite, "BondToken", "be4cdfea4ca9033c");
 #endif
 
 	UpdateVersion();
@@ -119,7 +118,7 @@ HRESULT CBondHub::OnBrokerDetach()
 }
 
 
-HRESULT CBondHub::GetDeviceID(IPremiseObject *pObject, string& str)
+HRESULT CBondHub::GetDeviceID(IPremiseObject* pObject, string& str)
 {
 	return GetValue(pObject, L"DeviceID", str);
 }
@@ -201,10 +200,11 @@ HRESULT CBondHub::QueryStateOfDevices()
 	return S_OK;
 }
 
-HRESULT CBondHub::OnObjectCreated(IPremiseObject *pContainer, IPremiseObject *pCreatedObject)
+HRESULT CBondHub::OnObjectCreated(IPremiseObject* pContainer, IPremiseObject* pCreatedObject)
 {
-	//if (IsObjectOfExplicitType(pCreatedObject, XML_Bond_CeilingFan))
-	//	CreateFan(pCreatedObject);
+	if (IsObjectOfExplicitType(pCreatedObject, XML_Bond_CeilingFan))
+	{
+	}
 	return S_OK;
 }
 
@@ -213,7 +213,7 @@ HRESULT CBondHub::OnObjectDeleted(IPremiseObject* pContainer, IPremiseObject* pD
 	return S_OK;
 }
 
-HRESULT CBondHub::OnFanSpeedSettingChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CBondHub::OnFanSpeedSettingChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	int nVal = newValue.lVal;//0,25,50,75,100
 	pObject->SetValueEx(SVCC_NOTIFY | SVCC_DRIVER, L"Speed", &CComVariant((double)nVal / 100.0));
@@ -223,7 +223,7 @@ HRESULT CBondHub::OnFanSpeedSettingChanged(IPremiseObject *pObject, VARIANT newV
 }
 
 //percent 0.0 -- 100.0
-HRESULT CBondHub::OnFanSpeedChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CBondHub::OnFanSpeedChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (newValue.vt != VT_R8)
 		return E_INVALIDARG;
@@ -257,15 +257,8 @@ HRESULT CBondHub::GetBaseUrl(string& url)
 	return S_OK;
 }
 
-static size_t callback(void* ptr, size_t size, size_t nmemb, string* s)
-{
-	s->append((char*)ptr, size * nmemb);
-	return size * nmemb;
-}
-
 HRESULT CBondHub::OnDiscoverTokenChanged(IPremiseObject* pObject, VARIANT newValue)
 {
-	USES_CONVERSION;
 	ObjectLock lock(this);
 	if (newValue.vt == VT_BOOL && newValue.boolVal == VARIANT_TRUE)
 	{
@@ -278,7 +271,7 @@ HRESULT CBondHub::OnDiscoverTokenChanged(IPremiseObject* pObject, VARIANT newVal
 			if (iter != obj.values.end())
 			{
 				const auto& value = iter->second;
-				SetValueA(L"BondToken", value.str.c_str());
+				SetValue(m_spSite, "BondToken", value.str);
 			}
 		});
 	}
@@ -291,27 +284,17 @@ HRESULT CBondHub::OnAddressChanged(IPremiseObject* pObject, VARIANT newValue)
 	return S_OK;
 }
 
-static void SetValueFromObject(IPremiseObject* pDevice, const wchar_t* property, const object_t& obj, const char* valuename)
-{
-	USES_CONVERSION;
-	auto& str = obj.get_string(valuename);
-	CComVariant value(A2COLE(str.c_str()));
-	pDevice->SetValue((BSTR)property, &value);
-}
-
-
 HRESULT CBondHub::SetDeviceInfo(CComPtr<IPremiseObject> spDevice, const object_t& obj)
 {
-	SetValueFromObject(spDevice, L"BondName", obj, "name");
-	SetValueFromObject(spDevice, L"BondType", obj, "type");
-	SetValueFromObject(spDevice, L"Location", obj, "location");
-	SetValueFromObject(spDevice, L"Template", obj, "template");
+	SetValue(spDevice, "BondName", obj.get_string("name"));
+	SetValue(spDevice, "BondType", obj.get_string("type"));
+	SetValue(spDevice, "Location", obj.get_string("location"));
+	SetValue(spDevice, "Template", obj.get_string("template"));
 	return S_OK;
 }
 
 HRESULT CBondHub::CreateDevice(const string& id)
 {
-	USES_CONVERSION;
 	CComPtr<IPremiseObject> spNew;
 
 	// Get information about device.
@@ -340,8 +323,9 @@ HRESULT CBondHub::CreateDevice(const string& id)
 	if (spNew)
 	{
 		SetValue(spNew, L"DisplayName", CComVariant(bstrName));
-		SetValue(spNew, L"DeviceID", CComVariant(A2COLE(id.c_str())));
+		SetValue(spNew, "DeviceID", id);
 		SetDeviceInfo(spNew, obj);
+		DiscoverActions(spNew);
 	}
 
 	return S_OK;
@@ -349,7 +333,6 @@ HRESULT CBondHub::CreateDevice(const string& id)
 
 HRESULT CBondHub::CreateAction(IPremiseObject* p, const string& name)
 {
-	USES_CONVERSION;
 	CComPtr<IPremiseObject> spNew;
 
 	CComBSTR bstrName(name.c_str());
@@ -357,6 +340,7 @@ HRESULT CBondHub::CreateAction(IPremiseObject* p, const string& name)
 
 	if (spNew)
 	{
+		// TODO - Consider automatically providing default arguments for actions that need them.
 	}
 
 	return S_OK;
@@ -382,36 +366,37 @@ HRESULT CBondHub::OnDiscoverDevicesChanged(IPremiseObject* pObject, VARIANT newV
 	return S_OK;
 }
 
+void CBondHub::DiscoverActions(IPremiseObject* pObject)
+{
+	string strID;
+	if (SUCCEEDED(GetDeviceID(pObject, strID)))
+	{
+		string strCommand = "/v2/devices/" + strID + "/actions";
+		CComPtr<IPremiseObject> spObject{ pObject };
+		QueueWork([=]()
+		{
+			string output;
+			object_t obj;
+			InvokeCommand(strCommand.c_str(), output, obj, true /*use_token*/);
+			for (auto& item : obj.values)
+			{
+				ObjectLock lock(this);
+				if (item.first != "_")
+					CreateAction(spObject, item.first);
+			}
+		});
+	}
+}
+
 HRESULT CBondHub::OnDiscoverActions(IPremiseObject* pObject, VARIANT newValue)
 {
-	USES_CONVERSION;
 	if (newValue.vt == VT_BOOL && newValue.boolVal == VARIANT_TRUE)
-	{
-		string strID;
-		if (SUCCEEDED(GetDeviceID(pObject, strID)))
-		{
-			string strCommand = "/v2/devices/" + strID + "/actions";
-			CComPtr<IPremiseObject> spObject{ pObject };
-			QueueWork([=]()
-			{
-				string output;
-				object_t obj;
-				InvokeCommand(strCommand.c_str(), output, obj, true /*use_token*/);
-				for (auto& item : obj.values)
-				{
-					ObjectLock lock(this);
-					if (item.first != "_")
-						CreateAction(spObject, item.first);
-				}
-			});
-		}
-	}
+		DiscoverActions(pObject);
 	return S_OK;
 }
 
 HRESULT CBondHub::OnTriggerAction(IPremiseObject* pObject, VARIANT newValue)
 {
-	USES_CONVERSION;
 	HRESULT hr = E_FAIL;
 	if (newValue.vt != VT_BOOL)
 		return hr;
@@ -454,7 +439,6 @@ HRESULT CBondHub::OnTriggerAction(IPremiseObject* pObject, VARIANT newValue)
 	return S_OK;
 }
 
-
 void CBondHub::UpdateVersion()
 {
 	QueueWork([=]()
@@ -464,16 +448,8 @@ void CBondHub::UpdateVersion()
 		InvokeCommand("/v2/sys/version", output, obj, false /*use_token*/);
 		auto iter = obj.values.find("fw_ver");
 		if (iter != obj.values.end())
-			SetValueA(L"Firmware", iter->second.str.c_str());
+			SetValue(m_spSite, "Firmware", iter->second.str);
 	});
-}
-
-// Helper for setting property.
-void CBondHub::SetValueA(const wchar_t* name, const char* value)
-{
-	USES_CONVERSION;
-	CComVariant varOutput(A2COLE(value));
-	::SetValue(m_spSite, (BSTR)name, varOutput);
 }
 
 // Adds the Bond token to the CURL header.
@@ -508,21 +484,20 @@ void CBondHub::InvokeCommand(const char* command, string& output, object_t& obj,
 		if (use_token)
 			AddTokenToHeader(curl);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &output);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
+		/* Note the plus in front of the lambda causes decay to regular function pointer. */
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+			+[](void* ptr, size_t size, size_t nmemb, string* s) -> size_t
+		{
+			s->append((char*)ptr, size * nmemb);
+			return size * nmemb;
+		});
 
 		auto res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 		if (res == CURLE_OK)
 			simple_json_parser p(output, obj);
 	}
-	SetValueA(L"LastResponse", output.c_str());
-}
-
-size_t read_callback(char* buffer, size_t size, size_t nitems, void* userdata)
-{
-	const string& str = *(reinterpret_cast<const string*>(userdata));
-	memcpy(buffer, str.data(), str.size());
-	return str.size();
+	SetValue(m_spSite, "LastResponse", output);
 }
 
 void CBondHub::InvokeAction(const string& action, const string& payload)
@@ -545,13 +520,26 @@ void CBondHub::InvokeAction(const string& action, const string& payload)
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		AddTokenToHeader(curl);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &output);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
-	
+		/* Note the plus in front of the lambda causes decay to regular function pointer. */
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+			+[](void* ptr, size_t size, size_t nmemb, string* s) -> size_t
+		{
+			s->append((char*)ptr, size * nmemb);
+			return size * nmemb;
+		});
+
 		/* now specify data to pass to our callback */
 		if (!payload.empty())
 		{
 			curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
-			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+			/* Note the plus in front of the lambda causes decay to regular function pointer. */
+			curl_easy_setopt(curl, CURLOPT_READFUNCTION,
+				+[](char* buffer, size_t size, size_t nitems, void* userdata) -> size_t
+			{
+				const string& str = *(reinterpret_cast<const string*>(userdata));
+				memcpy(buffer, str.data(), str.size());
+				return str.size();
+			});
 			curl_easy_setopt(curl, CURLOPT_READDATA, &payload);
 			/* Set the size of the data to upload */
 			curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)payload.size());
@@ -562,5 +550,5 @@ void CBondHub::InvokeAction(const string& action, const string& payload)
 		if ((res == CURLE_OK) && !output.empty())
 			simple_json_parser p(output, obj);
 	}
-	SetValueA(L"LastResponse", output.c_str());
+	SetValue(m_spSite, "LastResponse", output);
 }

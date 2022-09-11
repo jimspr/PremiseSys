@@ -1,10 +1,11 @@
 @echo off
+setlocal
 if "%1"=="" goto help
 
 set dest=%ProgramFiles(x86)%\premise\sys
 if not exist "%dest%" goto help
 
-echo Killing sys process
+echo Killing sys processes
 taskkill /f /im sys.exe
 taskkill /f /im psmonitor.exe
 taskkill /f /im prkernel.exe
@@ -24,7 +25,7 @@ for %%F in (spBond spRadioRA2) do (
 
 echo Starting service and launching client.
 start /wait net start prkernel
-start /D"%ProgramFiles(x86)%\premise\sys\bin" sys.exe
+start /D "%ProgramFiles(x86)%\premise\sys\bin" sys.exe
 
 goto Exit
 
@@ -33,4 +34,4 @@ echo "Usage:  upd Release|Debug [reset]"
 echo "        reset will cause all sys data to be deleted (slserver.xdo, data\*)
 echo Example: upd Debug reset
 :Exit
-set dest=
+endlocal

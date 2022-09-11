@@ -35,10 +35,10 @@ public:
 	DECLARE_NO_REGISTRY()
 	DECLARE_NOT_AGGREGATABLE(CBondHub)
 
-BEGIN_COM_MAP(CBondHub)
-	COM_INTERFACE_ENTRY(IObjectWithSite)
-	COM_INTERFACE_ENTRY(IPremiseNotify)
-END_COM_MAP()
+	BEGIN_COM_MAP(CBondHub)
+		COM_INTERFACE_ENTRY(IObjectWithSite)
+		COM_INTERFACE_ENTRY(IPremiseNotify)
+	END_COM_MAP()
 
 	// Smart lighting may not be needed. Not sure how bond lights work yet.
 	CComPtr<IObjectWithSite> m_spSmartLighting;
@@ -59,16 +59,16 @@ END_COM_MAP()
 	STDMETHOD(OnObjectCreated)(IPremiseObject* pContainer, IPremiseObject* pCreatedObject) override;
 	STDMETHOD(OnObjectDeleted)(IPremiseObject* pContainer, IPremiseObject* pDeletedObject) override;
 
-BEGIN_NOTIFY_MAP(CBondHub)
-	NOTIFY_PROPERTY(L"DiscoverToken", OnDiscoverTokenChanged)
-	NOTIFY_PROPERTY(L"DiscoverDevices", OnDiscoverDevicesChanged)
-	NOTIFY_PROPERTY(L"IPAddress", OnAddressChanged)
-	NOTIFY_PROPERTY(L"SpeedSetting", OnFanSpeedSettingChanged)
-	NOTIFY_PROPERTY(L"Speed", OnFanSpeedChanged)
-	NOTIFY_PROPERTY(L"PowerState", OnPowerStateChanged)
-	NOTIFY_PROPERTY(L"DiscoverActions", OnDiscoverActions)
-	NOTIFY_PROPERTY(L"Trigger", OnTriggerAction)
-END_NOTIFY_MAP()
+	BEGIN_NOTIFY_MAP(CBondHub)
+		NOTIFY_PROPERTY(L"DiscoverToken", OnDiscoverTokenChanged)
+		NOTIFY_PROPERTY(L"DiscoverDevices", OnDiscoverDevicesChanged)
+		NOTIFY_PROPERTY(L"IPAddress", OnAddressChanged)
+		NOTIFY_PROPERTY(L"SpeedSetting", OnFanSpeedSettingChanged)
+		NOTIFY_PROPERTY(L"Speed", OnFanSpeedChanged)
+		NOTIFY_PROPERTY(L"PowerState", OnPowerStateChanged)
+		NOTIFY_PROPERTY(L"DiscoverActions", OnDiscoverActions)
+		NOTIFY_PROPERTY(L"Trigger", OnTriggerAction)
+	END_NOTIFY_MAP()
 
 	HRESULT OnDiscoverTokenChanged(IPremiseObject* pObject, VARIANT newValue);
 	HRESULT OnDiscoverDevicesChanged(IPremiseObject* pObject, VARIANT newValue);
@@ -79,7 +79,7 @@ END_NOTIFY_MAP()
 	HRESULT OnDiscoverActions(IPremiseObject* pObject, VARIANT newValue);
 	HRESULT OnTriggerAction(IPremiseObject* pObject, VARIANT newValue);
 
-	HRESULT GetDeviceID(IPremiseObject *pObject, std::string& str);
+	HRESULT GetDeviceID(IPremiseObject* pObject, std::string& str);
 	HRESULT OnBrokerAttach() override;
 	HRESULT OnBrokerDetach() override;
 	HRESULT GetBaseUrl(std::string& url);
@@ -89,10 +89,10 @@ END_NOTIFY_MAP()
 	HRESULT QueryStateOfDevices();
 
 	void UpdateVersion();
-	void SetValueA(const wchar_t* name, const char* value);
 	void InvokeCommand(const char* command, std::string& output, object_t& obj, bool use_token);
 	void InvokeAction(const std::string& action, const std::string& payload);
 	void SendFan(IPremiseObject* pObject, long nLevel);
 	void SendPower(IPremiseObject* pObject, bool state);
 	void AddTokenToHeader(void* curl);
+	void DiscoverActions(IPremiseObject* pObject);
 };

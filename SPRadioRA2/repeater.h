@@ -30,14 +30,14 @@
 
 enum Keypads
 {
-	RRD_1RLD = 0, 
-	RRD_2RLD, 
-	RRD_3BD, 
-	RRD_3BRL, 
-	RRD_3BSRL, 
-	RRD_4S, 
-	RRD_5BRL, 
-	RRD_6BRL, 
+	RRD_1RLD = 0,
+	RRD_2RLD,
+	RRD_3BD,
+	RRD_3BRL,
+	RRD_3BSRL,
+	RRD_4S,
+	RRD_5BRL,
+	RRD_6BRL,
 	RRD_7B,
 };
 
@@ -113,7 +113,7 @@ enum Monitor_Type
 // CMainRepeater
 // This object is not externally createable, so we don't need all of the COM
 // baggage of registry, CLSID, etc
-class ATL_NO_VTABLE CMainRepeater : 
+class ATL_NO_VTABLE CMainRepeater :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<CMainRepeater>,
 	public CPremiseBufferedPortDevice
@@ -122,11 +122,11 @@ public:
 	DECLARE_NO_REGISTRY()
 	DECLARE_NOT_AGGREGATABLE(CMainRepeater)
 
-BEGIN_COM_MAP(CMainRepeater)
-	COM_INTERFACE_ENTRY(IObjectWithSite)
-	COM_INTERFACE_ENTRY(IPremisePortCallback)
-	COM_INTERFACE_ENTRY(IPremiseNotify)
-END_COM_MAP()
+	BEGIN_COM_MAP(CMainRepeater)
+		COM_INTERFACE_ENTRY(IObjectWithSite)
+		COM_INTERFACE_ENTRY(IPremisePortCallback)
+		COM_INTERFACE_ENTRY(IPremiseNotify)
+	END_COM_MAP()
 
 	bool m_networkMode = false; // true if login/password specified
 	bool m_fReady = false; // m_fReady is set once the port is opened (serial port) or once the login handshake has occurred (telnet port)
@@ -147,42 +147,42 @@ END_COM_MAP()
 	HRESULT OnDeviceState(DEVICE_STATE ps) override;
 
 public:
-	
-BEGIN_NOTIFY_MAP(CMainRepeater) 
-	NOTIFY_PROPERTY(L"Command", OnCommandChanged) 
-	NOTIFY_PROPERTY(L"PowerState", OnPowerStateChanged) 
-	NOTIFY_PROPERTY(L"Network", OnNetworkChanged) 
-	NOTIFY_PROPERTY(L"EnableLogging", OnLoggingChanged) 
-	NOTIFY_PROPERTY(L"_Brightness", On_BrightnessChanged) 
-	NOTIFY_PROPERTY(L"Buttons", OnButtonsChanged) 
-	NOTIFY_PROPERTY(L"Trigger", OnTriggerChanged)	//phantom button "pressed"
-	//NOTIFY_PROPERTY(L"SSM", OnSSMChanged) 
-	//NOTIFY_PROPERTY(L"SFM", OnSFMChanged) 
-	NOTIFY_PROPERTY(L"Flash", OnFlashChanged) 
-	NOTIFY_PROPERTY(L"QuerySystemInfo", OnQuerySystemChanged)
 
-	NOTIFY_PROPERTY(L"Setting", OnFanSettingChanged)
-	NOTIFY_PROPERTY(L"Speed", OnFanSpeedChanged)
+	BEGIN_NOTIFY_MAP(CMainRepeater)
+		NOTIFY_PROPERTY(L"Command", OnCommandChanged)
+		NOTIFY_PROPERTY(L"PowerState", OnPowerStateChanged)
+		NOTIFY_PROPERTY(L"Network", OnNetworkChanged)
+		NOTIFY_PROPERTY(L"EnableLogging", OnLoggingChanged)
+		NOTIFY_PROPERTY(L"_Brightness", On_BrightnessChanged)
+		NOTIFY_PROPERTY(L"Buttons", OnButtonsChanged)
+		NOTIFY_PROPERTY(L"Trigger", OnTriggerChanged)	//phantom button "pressed"
+		//NOTIFY_PROPERTY(L"SSM", OnSSMChanged) 
+		//NOTIFY_PROPERTY(L"SFM", OnSFMChanged) 
+		NOTIFY_PROPERTY(L"Flash", OnFlashChanged)
+		NOTIFY_PROPERTY(L"QuerySystemInfo", OnQuerySystemChanged)
 
-	NOTIFY_PROPERTY(L"ForceLED", OnForceLEDChanged) 
-	NOTIFY_PROPERTY(L"Scene", OnSceneChanged)
-END_NOTIFY_MAP() 
+		NOTIFY_PROPERTY(L"Setting", OnFanSettingChanged)
+		NOTIFY_PROPERTY(L"Speed", OnFanSpeedChanged)
 
-	HRESULT STDMETHODCALLTYPE OnCommandChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnPowerStateChanged(IPremiseObject *pObject, VARIANT newValue);
+		NOTIFY_PROPERTY(L"ForceLED", OnForceLEDChanged)
+		NOTIFY_PROPERTY(L"Scene", OnSceneChanged)
+	END_NOTIFY_MAP()
 
-	HRESULT STDMETHODCALLTYPE On_BrightnessChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnForceLEDChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnSceneChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnFanSettingChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnFanSpeedChanged(IPremiseObject *pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnCommandChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnPowerStateChanged(IPremiseObject* pObject, VARIANT newValue);
 
-	HRESULT STDMETHODCALLTYPE OnQuerySystemChanged(IPremiseObject *pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE On_BrightnessChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnForceLEDChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnSceneChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnFanSettingChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnFanSpeedChanged(IPremiseObject* pObject, VARIANT newValue);
 
-	HRESULT STDMETHODCALLTYPE OnTriggerChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnFlashChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnButtonsChanged(IPremiseObject *pObject, VARIANT newValue);
-	HRESULT STDMETHODCALLTYPE OnObjectCreated(IPremiseObject *pContainer, IPremiseObject *pCreatedObject);
+	HRESULT STDMETHODCALLTYPE OnQuerySystemChanged(IPremiseObject* pObject, VARIANT newValue);
+
+	HRESULT STDMETHODCALLTYPE OnTriggerChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnFlashChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnButtonsChanged(IPremiseObject* pObject, VARIANT newValue);
+	HRESULT STDMETHODCALLTYPE OnObjectCreated(IPremiseObject* pContainer, IPremiseObject* pCreatedObject);
 	HRESULT STDMETHODCALLTYPE OnObjectDeleted(IPremiseObject* pContainer, IPremiseObject* pDeletedObject);
 
 	void UpdateFirmware(LPCSTR psz);
@@ -200,10 +200,10 @@ END_NOTIFY_MAP()
 	static HRESULT CreateKeypadButtons(IPremiseObject* pObject, Keypads kp);
 	static HRESULT CreateVCRX(IPremiseObject* pObject);
 
-	HRESULT GetDeviceID(IPremiseObject *pObject, long& l);
+	HRESULT GetDeviceID(IPremiseObject* pObject, long& l);
 	HRESULT GetFadeTime(IPremiseObject* pObject, double& seconds);
 	HRESULT GetFadeTime(IPremiseObject* pObject, char buf[64]);
-	HRESULT GetButtonAddress(IPremiseObject *pObject, long* pl);
+	HRESULT GetButtonAddress(IPremiseObject* pObject, long* pl);
 	void SendSwitch(IPremiseObject* pObject, bool bOn);
 	void SendDim(IPremiseObject* pObject, long nBright);
 	void SendFan(IPremiseObject* pObject, long nLevel);

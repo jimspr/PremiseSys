@@ -11,7 +11,7 @@ extern const CLSID CLSID_RadioRA2;
 
 /////////////////////////////////////////////////////////////////////////////
 // CRadioRA2
-class ATL_NO_VTABLE CRadioRA2 : 
+class ATL_NO_VTABLE CRadioRA2 :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<CRadioRA2, &CLSID_RadioRA2>,
 	public CPremiseDriverImpl
@@ -21,16 +21,16 @@ public:
 	{
 	}
 
-DECLARE_NO_REGISTRY()
-DECLARE_NOT_AGGREGATABLE(CRadioRA2)
+	DECLARE_NO_REGISTRY()
+	DECLARE_NOT_AGGREGATABLE(CRadioRA2)
 
-BEGIN_COM_MAP(CRadioRA2)
-	COM_INTERFACE_ENTRY(IObjectWithSite)
-	COM_INTERFACE_ENTRY(IPremiseNotify)
-END_COM_MAP()
+	BEGIN_COM_MAP(CRadioRA2)
+		COM_INTERFACE_ENTRY(IObjectWithSite)
+		COM_INTERFACE_ENTRY(IPremiseNotify)
+	END_COM_MAP()
 
-BEGIN_NOTIFY_MAP(CRadioRA2) 
-END_NOTIFY_MAP() 
+	BEGIN_NOTIFY_MAP(CRadioRA2)
+	END_NOTIFY_MAP()
 
 	HRESULT CreateControllerForSite(IPremiseObject* pObject, IObjectWithSite** ppSite, bool bFirstTime)
 	{

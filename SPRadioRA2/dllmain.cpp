@@ -6,7 +6,7 @@ const CLSID CLSID_RadioRA2 = { 0x5549B78A, 0x9350, 0x409E, { 0x9d, 0xc0, 0x01, 0
 CComModule _Module;
 
 BEGIN_OBJECT_MAP(ObjectMap)
-OBJECT_ENTRY(CLSID_RadioRA2, CRadioRA2)
+	OBJECT_ENTRY(CLSID_RadioRA2, CRadioRA2)
 END_OBJECT_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -15,14 +15,14 @@ END_OBJECT_MAP()
 extern "C"
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 {
-    if (dwReason == DLL_PROCESS_ATTACH)
-    {
-        _Module.Init(ObjectMap, hInstance, nullptr);
-        DisableThreadLibraryCalls(hInstance);
-    }
-    else if (dwReason == DLL_PROCESS_DETACH)
-        _Module.Term();
-    return TRUE;    // ok
+	if (dwReason == DLL_PROCESS_ATTACH)
+	{
+		_Module.Init(ObjectMap, hInstance, nullptr);
+		DisableThreadLibraryCalls(hInstance);
+	}
+	else if (dwReason == DLL_PROCESS_DETACH)
+		_Module.Term();
+	return TRUE;    // ok
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 
 STDAPI DllCanUnloadNow(void)
 {
-    return (_Module.GetLockCount()==0) ? S_OK : S_FALSE;
+	return (_Module.GetLockCount() == 0) ? S_OK : S_FALSE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,5 +38,5 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
-    return _Module.GetClassObject(rclsid, riid, ppv);
+	return _Module.GetClassObject(rclsid, riid, ppv);
 }

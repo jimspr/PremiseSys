@@ -13,7 +13,7 @@ struct CRadioRA2Button
 	bool simple;
 };
 
-CRadioRA2Button keypadButtons[11] = 
+CRadioRA2Button keypadButtons[11] =
 {
 	{L"Button1", 1, false},
 	{L"Button2", 2, false},
@@ -31,18 +31,18 @@ CRadioRA2Button keypadButtons[11] =
 // keypadInfo describes the different types of the seeTouch in-wall keypads
 // The 1/0 in the array below determines what buttons from keypadButtons above
 // is applied when generating a keypad
-bool keypadInfo[][11] = 
+bool keypadInfo[][11] =
 {
 	//			1	2	ru	rl	3	4	5	6	7	r	l
-/*1RLD*/	{	1,	1,	0,	0,	1,	0,	1,	1,	0,	1,	1},
-/*2RLD*/	{	1,	1,	1,	1,	0,	0,	1,	1,	0,	1,	1},
-/*3BD*/		{	1,	1,	0,	0,	1,	0,	1,	1,	1,	0,	0},
-/*3BRL*/	{	0,	1,	0,	0,	1,	1,	0,	0,	0,	1,	1},
-/*3BSRL*/	{	1,	0,	0,	0,	1,	0,	1,	0,	0,	1,	1},
-/*4S*/		{	1,	1,	0,	0,	1,	1,	0,	1,	0,	1,	1},
-/*5BRL*/	{	1,	1,	0,	0,	1,	1,	1,	0,	0,	1,	1},
-/*6BRL*/	{	1,	1,	0,	0,	1,	1,	1,	1,	0,	1,	1},
-/*7B*/		{	1,	1,	0,	0,	1,	1,	1,	1,	1,	0,	0},
+	/*1RLD*/	{	1,	1,	0,	0,	1,	0,	1,	1,	0,	1,	1},
+	/*2RLD*/	{	1,	1,	1,	1,	0,	0,	1,	1,	0,	1,	1},
+	/*3BD*/		{	1,	1,	0,	0,	1,	0,	1,	1,	1,	0,	0},
+	/*3BRL*/	{	0,	1,	0,	0,	1,	1,	0,	0,	0,	1,	1},
+	/*3BSRL*/	{	1,	0,	0,	0,	1,	0,	1,	0,	0,	1,	1},
+	/*4S*/		{	1,	1,	0,	0,	1,	1,	0,	1,	0,	1,	1},
+	/*5BRL*/	{	1,	1,	0,	0,	1,	1,	1,	0,	0,	1,	1},
+	/*6BRL*/	{	1,	1,	0,	0,	1,	1,	1,	1,	0,	1,	1},
+	/*7B*/		{	1,	1,	0,	0,	1,	1,	1,	1,	1,	0,	0},
 };
 
 CRadioRA2Button allonoff_buttons_[2] =
@@ -57,10 +57,10 @@ CRadioRA2Button lower_raise_buttons_[2] =
 	{L"Raise",		25, true},
 };
 
-typedef void (CMainRepeater::*MFP)(LPCSTR psz);
+typedef void (CMainRepeater::* MFP)(LPCSTR psz);
 
 // This table defines what to do with data coming from the repeater
-JumpTableEntry<MFP> arrJT[] = 
+JumpTableEntry<MFP> arrJT[] =
 {
 	{"GNET> ", &CMainRepeater::UpdateGNET},
 	{"OS Firmware Revision = ", &CMainRepeater::UpdateFirmware},
@@ -72,8 +72,8 @@ JumpTableEntry<MFP> arrJT[] =
 };
 
 // The prompts table is to handle logging into the repeater
-typedef void (CMainRepeater::*VFP)();
-JumpTableEntry<VFP> prompts[] = 
+typedef void (CMainRepeater::* VFP)();
+JumpTableEntry<VFP> prompts[] =
 {
 	{"GNET> ", &CMainRepeater::OnGNET},
 	{"login: ", &CMainRepeater::OnLogin},
@@ -86,7 +86,7 @@ static bool IsObjectOfType(IPremiseObject* pObject, BSTR bstrClassName)
 {
 	VARIANT_BOOL bType = VARIANT_FALSE;
 	HRESULT hr = pObject->IsOfType(bstrClassName, &bType);
-	if(SUCCEEDED(hr) && bType)
+	if (SUCCEEDED(hr) && bType)
 		return true;
 	return false;
 }
@@ -125,7 +125,7 @@ static int ClampFanSetting(int d)
 
 ////////////////////////////////////////////////////////////////////////////
 // CMainRepeater
-	
+
 bool CMainRepeater::OnPing()
 {
 	if (m_fReady)
@@ -161,7 +161,7 @@ HRESULT CMainRepeater::OnBrokerAttach()
 	m_spSite->TransactionOpen(SVCC_NOTIFY, SVT_CREATE);
 	do
 	{
-		hr = m_spSite->CreateEx(SVCC_FIXED | SVCC_EXIST | SVCC_NOTIFY, 
+		hr = m_spSite->CreateEx(SVCC_FIXED | SVCC_EXIST | SVCC_NOTIFY,
 			(BSTR)XML_RadioRA2_PhantomButtons, (BSTR)L"PhantomButtons", &spNew);
 		if (FAILED(hr))
 			break;
@@ -225,7 +225,7 @@ void CMainRepeater::ProcessLine(LPCSTR psz)
 	}
 }
 
-HRESULT CMainRepeater::GetButtonAddress(IPremiseObject *pObject, long* pl)
+HRESULT CMainRepeater::GetButtonAddress(IPremiseObject* pObject, long* pl)
 {
 	pl[0] = 0;
 	pl[1] = 0;
@@ -244,7 +244,7 @@ HRESULT CMainRepeater::GetButtonAddress(IPremiseObject *pObject, long* pl)
 	return S_OK;
 }
 
-HRESULT CMainRepeater::GetDeviceID(IPremiseObject *pObject, long& l)
+HRESULT CMainRepeater::GetDeviceID(IPremiseObject* pObject, long& l)
 {
 	l = 0;
 	HRESULT hr = GetValue(pObject, L"DeviceID", l);
@@ -267,7 +267,7 @@ HRESULT CMainRepeater::GetFadeTime(IPremiseObject* pObject, char buf[64])
 	return S_OK;
 }
 
-HRESULT CMainRepeater::OnForceLEDChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnForceLEDChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (pObject == NULL)
 		return E_POINTER;
@@ -291,21 +291,21 @@ HRESULT CMainRepeater::OnForceLEDChanged(IPremiseObject *pObject, VARIANT newVal
 	return S_OK;
 }
 
-HRESULT CMainRepeater::OnCommandChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnCommandChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	char buf[64];
 	USES_CONVERSION;
 	CComBSTR command = newValue.bstrVal;
 	if (command.Length() != 0)
 	{
-		SetValueEx(m_spSite, SVCC_NOTIFY|SVCC_DRIVER, L"Command", CComVariant(L""));
+		SetValueEx(m_spSite, SVCC_NOTIFY | SVCC_DRIVER, L"Command", CComVariant(L""));
 		wsprintfA(buf, "%s\r\n", W2A(command));
 		SendBufferedCommandAndWait(buf, 1000);
 	}
 	return S_OK;
 }
 
-HRESULT CMainRepeater::OnPowerStateChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnPowerStateChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (pObject == NULL)
 		return E_POINTER;
@@ -315,13 +315,13 @@ HRESULT CMainRepeater::OnPowerStateChanged(IPremiseObject *pObject, VARIANT newV
 	return S_OK;
 }
 
-HRESULT CMainRepeater::On_BrightnessChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::On_BrightnessChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (pObject == NULL)
 		return E_POINTER;
 	if (newValue.vt != VT_R8)
 		return E_INVALIDARG;
-	long nBright = (int)(newValue.dblVal*100.+.5);
+	long nBright = (int)(newValue.dblVal * 100. + .5);
 
 	SendDim(pObject, nBright);
 	return S_OK;
@@ -375,7 +375,7 @@ void CMainRepeater::SendFan(IPremiseObject* pObject, long nLevel)
 	SendBufferedCommandNoAck(buf);
 }
 
-HRESULT CMainRepeater::OnSceneChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnSceneChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (!IsObjectOfExplicitType(pObject, XML_RadioRA2_GRXI))
 		return S_FALSE;
@@ -385,7 +385,7 @@ HRESULT CMainRepeater::OnSceneChanged(IPremiseObject *pObject, VARIANT newValue)
 	if (FAILED(hr))
 		return S_FALSE;
 
-	if ((newValue.lVal < 0) || (newValue.lVal > 16)) 
+	if ((newValue.lVal < 0) || (newValue.lVal > 16))
 		return S_FALSE;
 
 	char buf[64];
@@ -394,7 +394,7 @@ HRESULT CMainRepeater::OnSceneChanged(IPremiseObject *pObject, VARIANT newValue)
 	return S_OK;
 }
 
-HRESULT CMainRepeater::OnQuerySystemChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnQuerySystemChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (newValue.lVal == 0)
 		return S_FALSE;
@@ -406,10 +406,10 @@ HRESULT CMainRepeater::OnQuerySystemChanged(IPremiseObject *pObject, VARIANT new
 	QuerySystem(RA2S_Sunset);
 	QuerySystem(RA2S_Sunrise);
 	QuerySystem(RA2S_LoadShed);
-	
+
 	return S_OK;
 }
-	
+
 void CMainRepeater::UpdateFirmware(LPCSTR psz)
 {
 	// "OS Firmware Revision = "
@@ -545,14 +545,14 @@ void CMainRepeater::UpdateOutput(LPCSTR psz)
 
 		if (IsObjectOfExplicitType(spObj, XML_RadioRA2_DIMMER))
 		{
-			float fDim = (float)output/100.f;
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"Brightness", CComVariant(fDim));
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"PowerState", CComVariant(output ? true : false));
+			float fDim = (float)output / 100.f;
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"Brightness", CComVariant(fDim));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"PowerState", CComVariant(output ? true : false));
 		}
 		else if (IsObjectOfExplicitType(spObj, XML_RadioRA2_SWITCH))
 		{
 			bool powerstate = output ? true : false;
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"PowerState", CComVariant(powerstate));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"PowerState", CComVariant(powerstate));
 		}
 		else if (IsObjectOfExplicitType(spObj, XML_RadioRA2_FAN))
 		{
@@ -602,13 +602,13 @@ void CMainRepeater::UpdateDevice(LPCSTR psz)
 		switch (action)
 		{
 		case RA2_Press:
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"ButtonState", CComVariant(1));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"ButtonState", CComVariant(1));
 			break;
 		case RA2_Release:
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"ButtonState", CComVariant(0));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"ButtonState", CComVariant(0));
 			break;
 		case RA2_LedState:
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"Status", CComVariant(output ? true : false));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"Status", CComVariant(output ? true : false));
 			break;
 		}
 	}
@@ -619,13 +619,13 @@ void CMainRepeater::UpdateDevice(LPCSTR psz)
 		switch (action)
 		{
 		case RA2_Press:
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"ButtonState", CComVariant(1));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"ButtonState", CComVariant(1));
 			break;
 		case RA2_Release:
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"ButtonState", CComVariant(0));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"ButtonState", CComVariant(0));
 			break;
 		case RA2_LedState:
-			SetValueEx(spObj, SVCC_NOTIFY|SVCC_DRIVER, L"Status", CComVariant(output ? true : false));
+			SetValueEx(spObj, SVCC_NOTIFY | SVCC_DRIVER, L"Status", CComVariant(output ? true : false));
 			break;
 		}
 	}
@@ -654,17 +654,17 @@ void CMainRepeater::UpdateSystem(LPCSTR psz)
 		SetValue(m_spSite, L"Date", CComVariant(psz));
 		break;
 	case RA2S_LatLong: // Latitude -90.00 to +90.00 degrees, Longitude -180.00 to +180.00
-		{
-			char* end;
-			float lat = (float) strtod(psz, &end);
-			psz = NextField(psz);
-			float longitude = (float) strtod(psz, &end);
-			sprintf(buf, "%.2f", lat);
-			SetValue(m_spSite, L"Latitude", CComVariant(buf));
-			sprintf(buf, "%.2f", longitude);
-			SetValue(m_spSite, L"Longitude", CComVariant(buf));
-		}
-		break;
+	{
+		char* end;
+		float lat = (float)strtod(psz, &end);
+		psz = NextField(psz);
+		float longitude = (float)strtod(psz, &end);
+		sprintf(buf, "%.2f", lat);
+		SetValue(m_spSite, L"Latitude", CComVariant(buf));
+		sprintf(buf, "%.2f", longitude);
+		SetValue(m_spSite, L"Longitude", CComVariant(buf));
+	}
+	break;
 	case RA2S_TimeZone: // Hours=-12 to 12, Minutes = 0 to 59
 		SetValue(m_spSite, L"TimeZone", CComVariant(psz));
 		break;
@@ -677,14 +677,14 @@ void CMainRepeater::UpdateSystem(LPCSTR psz)
 	case RA2S_OSRev:
 		break;
 	case RA2S_LoadShed: // (0=Disabled, 1=Enabled)
-		{
-			long value = 0;
-			if (FAILED(DigitsToLong(psz, -1, value, true)))
-				return;
-			bool f = value ? true : false;
-			SetValue(m_spSite, L"LoadShed", CComVariant(f));
-		}
-		break;
+	{
+		long value = 0;
+		if (FAILED(DigitsToLong(psz, -1, value, true)))
+			return;
+		bool f = value ? true : false;
+		SetValue(m_spSite, L"LoadShed", CComVariant(f));
+	}
+	break;
 	default:
 		return;
 	}
@@ -755,7 +755,7 @@ HRESULT CMainRepeater::GetObjectByID(unsigned int nID, IPremiseObject** ppObject
 		//if (FAILED(hr))
 		//	return hr;
 		spObj = m_spSite;
-		
+
 		return spObj->GetChildByTypeAndProperty((BSTR)XML_RadioRA2_DEVICE, (BSTR)L"DeviceID", CComVariant((int)nID), ppObject);
 	}
 	else
@@ -779,18 +779,18 @@ HRESULT CMainRepeater::GetObjectByComponent(unsigned int id, unsigned int compon
 			HRESULT hr = m_spSite->GetChildByType((BSTR)XML_RadioRA2_PhantomButtons, &spObj);
 			if (FAILED(hr))
 				return hr;
-		
+
 			return spObj->GetChildByTypeAndProperty((BSTR)XML_Button, (BSTR)L"ComponentNumber", value, ppObject);
 		}
 		// Phantom LED
 		else if ((component >= 101) && (component <= 200))
 		{
-			CComVariant value((int) (component - 100));
+			CComVariant value((int)(component - 100));
 			CComPtr<IPremiseObject> spObj;
 			HRESULT hr = m_spSite->GetChildByType((BSTR)XML_RadioRA2_PhantomButtons, &spObj);
 			if (FAILED(hr))
 				return hr;
-		
+
 			return spObj->GetChildByTypeAndProperty((BSTR)XML_Button, (BSTR)L"ComponentNumber", value, ppObject);
 		}
 	}
@@ -874,8 +874,8 @@ void CMainRepeater::PrepareToOpen()
 	m_networkMode = false;
 	m_bstrPassword = L"";
 	m_bstrLogin = L"";
-	SetValueEx(m_spSite, SVCC_NOTIFY|SVCC_DRIVER, L"Login", CComVariant(L""));
-	SetValueEx(m_spSite, SVCC_NOTIFY|SVCC_DRIVER, L"Password", CComVariant(L""));
+	SetValueEx(m_spSite, SVCC_NOTIFY | SVCC_DRIVER, L"Login", CComVariant(L""));
+	SetValueEx(m_spSite, SVCC_NOTIFY | SVCC_DRIVER, L"Password", CComVariant(L""));
 
 	if (m_spSite == NULL)
 		return;
@@ -885,7 +885,7 @@ void CMainRepeater::PrepareToOpen()
 		return;
 	if (varNet.pdispVal == NULL)
 		return;
-	
+
 	varNet.pdispVal->QueryInterface(&spNetwork);
 	if (spNetwork == NULL)
 		return;
@@ -904,21 +904,21 @@ void CMainRepeater::PrepareToOpen()
 		if (FAILED(hr))
 			return;
 		m_bstrLogin = var.bstrVal;
-		SetValueEx(m_spSite, SVCC_NOTIFY|SVCC_DRIVER, L"Login", var);
+		SetValueEx(m_spSite, SVCC_NOTIFY | SVCC_DRIVER, L"Login", var);
 		var.Clear();
 
 		hr = spParent->GetValue((BSTR)L"Password", &var);
 		if (FAILED(hr))
 			return;
 		m_bstrPassword = var.bstrVal;
-		SetValueEx(m_spSite, SVCC_NOTIFY|SVCC_DRIVER, L"Password", var);
+		SetValueEx(m_spSite, SVCC_NOTIFY | SVCC_DRIVER, L"Password", var);
 
 		m_networkMode = ((m_bstrLogin.Length() != 0) && (m_bstrPassword.Length() != 0));
 	}
 }
 
 // "Press" a keypad button virtually
-HRESULT CMainRepeater::OnTriggerChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnTriggerChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (IsObjectOfExplicitType(pObject, XML_Button))
 	{
@@ -948,12 +948,12 @@ HRESULT CMainRepeater::OnTriggerChanged(IPremiseObject *pObject, VARIANT newValu
 		wsprintfA(buf, "#DEVICE,%d,%d,%d\r\n", nID, nComponentID, RA2_Release);
 		SendBufferedCommand(buf);
 		// reset trigger back to false
-		SetValueEx(pObject, SVCC_NOTIFY|SVCC_DRIVER, L"Trigger", CComVariant(false));
+		SetValueEx(pObject, SVCC_NOTIFY | SVCC_DRIVER, L"Trigger", CComVariant(false));
 	}
-	return S_OK;		
+	return S_OK;
 }
 
-HRESULT CMainRepeater::OnFlashChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnFlashChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (newValue.vt != VT_BOOL)
 		return E_INVALIDARG;
@@ -983,10 +983,10 @@ HRESULT CMainRepeater::OnFlashChanged(IPremiseObject *pObject, VARIANT newValue)
 	{
 		SendDim(pObject, 100);
 	}
-	return S_OK;		
+	return S_OK;
 }
 
-HRESULT CMainRepeater::OnButtonsChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnButtonsChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (IsObjectOfExplicitType(pObject, XML_RadioRA2_TableTop))
 	{
@@ -998,7 +998,7 @@ HRESULT CMainRepeater::OnButtonsChanged(IPremiseObject *pObject, VARIANT newValu
 	return S_OK;
 }
 
-HRESULT CMainRepeater::OnObjectCreated(IPremiseObject *pContainer, IPremiseObject *pCreatedObject)
+HRESULT CMainRepeater::OnObjectCreated(IPremiseObject* pContainer, IPremiseObject* pCreatedObject)
 {
 	if (IsObjectOfExplicitType(pCreatedObject, XML_T5RL))
 		CreateTableTopButtons(pCreatedObject, 5);
@@ -1039,7 +1039,7 @@ static void CreateSimpleButton(IPremiseObject* pObject, LPCWSTR name, int compon
 {
 	CComPtr<IPremiseObject> spNew;
 	pObject->CreateEx(SVCC_FIXED | SVCC_NOTIFY | SVCC_EXIST, (BSTR)XML_SimpleButton, (BSTR)name, &spNew);
-	if(spNew)
+	if (spNew)
 		SetValue(spNew, L"ComponentNumber", CComVariant(component));
 }
 
@@ -1047,7 +1047,7 @@ static void CreateButton(IPremiseObject* pObject, LPCWSTR name, int component, i
 {
 	CComPtr<IPremiseObject> spNew;
 	pObject->CreateEx(SVCC_FIXED | SVCC_NOTIFY | SVCC_EXIST, (BSTR)XML_Button, (BSTR)name, &spNew);
-	if(spNew)
+	if (spNew)
 	{
 		SetValue(spNew, L"ComponentNumber", CComVariant(component));
 		SetValue(spNew, L"LEDComponentNumber", CComVariant(led));
@@ -1067,7 +1067,7 @@ static void CreateButtonWithTrigger(IPremiseObject* pObject, LPWSTR name, int co
 
 static void CreateSimpleButtons(IPremiseObject* pObject, CRadioRA2Button* buttons, int n)
 {
-	for (int i = 0;i < n; ++i)
+	for (int i = 0; i < n; ++i)
 	{
 		CreateSimpleButton(pObject, buttons[i].pszName, buttons[i].nID);
 	}
@@ -1078,7 +1078,7 @@ static void CreateButtons(IPremiseObject* pObject, int n, int offset)
 	wchar_t buf[64];
 	int i;
 	// starting index of 1
-	for (i = 1;i <= n; ++i)
+	for (i = 1; i <= n; ++i)
 	{
 		CComPtr<IPremiseObject> spNew;
 		wsprintfW(buf, L"Button%d", i);
@@ -1143,7 +1143,7 @@ HRESULT CMainRepeater::CreatePhantomButtons(IPremiseObject* pObject)
 	return S_OK;
 }
 
-HRESULT CMainRepeater::OnFanSettingChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnFanSettingChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	int nVal = newValue.lVal;//0,25,50,75,100
 	SetValueEx(pObject, SVCC_NOTIFY | SVCC_DRIVER, L"Speed", CComVariant((double)nVal / 100.0));
@@ -1153,7 +1153,7 @@ HRESULT CMainRepeater::OnFanSettingChanged(IPremiseObject *pObject, VARIANT newV
 }
 
 //percent 0.0 -- 100.0
-HRESULT CMainRepeater::OnFanSpeedChanged(IPremiseObject *pObject, VARIANT newValue)
+HRESULT CMainRepeater::OnFanSpeedChanged(IPremiseObject* pObject, VARIANT newValue)
 {
 	if (newValue.vt != VT_R8)
 		return E_INVALIDARG;
